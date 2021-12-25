@@ -6,15 +6,18 @@ pub struct FolderReader{
 impl FolderReader{
     pub fn new(path:&Path) -> FolderReader{
         let metadata = fs::metadata(path).unwrap();
-        let root_path;
+        let mut root_path;
         if metadata.is_dir() {
             root_path = path.to_str().unwrap().to_string();
         }else{
             let str = path.to_str().unwrap();
             let mut a =str.split("\\").collect::<Vec<&str>>();
             a.pop();
-            a.push("\\");
+            
             root_path = a.join("\\");
+        }
+        if !root_path.ends_with("\\"){
+          root_path.push_str("\\");
         }
         FolderReader{
             root_path,
@@ -27,10 +30,12 @@ impl FolderReader{
     fn get_full_path_from_relative(&self,dir:&str)->String{
         let mut file_path = self.root_path.clone();
         file_path.push_str(dir);
+        
         file_path
     }
     pub fn get_file_as_string(&self,dir:&str)->Result<String,io::Error>{
         let file_path = self.get_full_path_from_relative(dir);
+        println!("{}",file_path);
         fs::read_to_string(file_path)
     }
     /// recursively enumerate all the files in the path

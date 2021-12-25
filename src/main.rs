@@ -1,5 +1,4 @@
 use std::env;
-use std::fs::{read_dir, File};
 // use std::io::Write;
 use std::path::Path;
 
@@ -26,7 +25,8 @@ fn main() {
     // // else print in the console
     // println!("{}",info);
     let fr = FolderReader::new(path);
-    let server = FileServer::start(8080,fr);
+    let mut server = FileServer::new(fr);
+    server.listen(8080).expect("io error happend to file server");
     println!("Press Enter to continue.");
     std::io::stdin().read_line(&mut String::new()).unwrap();
 }
