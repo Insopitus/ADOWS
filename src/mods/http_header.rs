@@ -1,3 +1,6 @@
+use core::str::Split;
+use std::collections::HashMap;
+
 /// An HTTP Request parser
 /// An HTTP Requset is made up of three parts:
 /// 1. a request line
@@ -10,24 +13,26 @@ pub struct RequestHeader {
     path: String,
     method: String,
     version: String,
-    content_length:usize,
+    header_fields: HashMap<String, String>,
 }
 impl RequestHeader {
     pub fn new(string: String) -> Self {
         let original_string = string.to_owned();
-        println!("{}", &original_string);
-        let line_one = string.split("\r\n").nth(0); // http headers are separeted by CRLFs
+        // println!("{}", &original_string);
+        let mut lines = string.split("\r\n"); // http headers are separeted by CRLFs
+        let line_one = lines.nth(0);
         let line_one = line_one.expect("Invalid HTTP Content.");
-        dbg!(line_one);
+        // dbg!(line_one);
         // request line (first line)
-        let (method,path,version) = RequestHeader::parse_request_line(line_one);
-      
+        let (method, path, version) = RequestHeader::parse_request_line(line_one);
+        let header_fields =
+            RequestHeader::parse_header_fields(&mut lines).expect("invalid HTTP header");
         RequestHeader {
             orginal_string: original_string,
             path,
             method,
             version,
-            content_length:64,
+            header_fields,
         }
     }
     pub fn get_method(&self) -> &String {
@@ -42,22 +47,49 @@ impl RequestHeader {
     pub fn is_get(&self) -> bool {
         self.method == "GET"
     }
-
-    fn parse_request_line(line_one:&str)->(String,String,String){
-      let mut line_one_iter = line_one.split(" ");
-      let method = line_one_iter
-          .next()
-          .expect("Invalid HTTP Content.")
-          .to_string();
-      let path = line_one_iter
-          .next()
-          .expect("Invalid HTTP Content.")
-          .to_string(); //TODO remove query strings
-      let version = line_one_iter
-          .next()
-          .expect("Invalid HTTP Content.")
-          .to_string();
-      (method,path,version)
+    pub fn get_content_length(&self) -> usize {
+        self.header_fields
+            .get("Content-Length")
+            .unwrap_or(&String::from("0"))
+            .parse::<usize>()
+            .unwrap_or(0) // TODO maybe shouldn't return 0 if parse failed
     }
-    fn parse_header_fields(){}
+    fn parse_request_line(line_one: &str) -> (String, String, String) {
+        let mut line_one_iter = line_one.split(" ");
+        let method = line_one_iter
+            .next()
+            .expect("Invalid HTTP Content.")
+            .to_string();
+        let path = line_one_iter
+            .next()
+            .expect("Invalid HTTP Content.")
+            .to_string(); //TODO remove query strings
+        let version = line_one_iter
+            .next()
+            .expect("Invalid HTTP Content.")
+            .to_string();
+        (method, path, version)
+    }
+    fn parse_header_fields(lines: &mut Split<&str>) -> Option<HashMap<String, String>> {
+        let mut map = HashMap::new();
+        loop {
+            let line = lines.next();
+            match line {
+                Some(pair) => match pair {
+                    "" => break,
+                    l => {
+                        let mut split = l.split(":");
+                        // dbg!(&split.collect::<Vec<_>>());
+
+                        let k = split.next()?.trim().to_owned();
+                        let v = split.next()?.trim().to_owned();
+
+                        map.insert(k, v);
+                    }
+                },
+                None => break,
+            }
+        }
+        Some(map)
+    }
 }

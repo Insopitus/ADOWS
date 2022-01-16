@@ -37,13 +37,12 @@ impl FileServer {
     }
     pub fn get_file_from_request(&self) {}
     fn handle_connection(&self, mut stream: TcpStream) -> Result<(), std::io::Error> {
-        let mut buf = [0u8; 1024]; //TODO accept arbitrary length
-        stream.read(&mut buf)?;
-        // let mut vec_buf:Vec<u8> = Vec::with_capacity(64);
-        // let mut buf_reader = BufReader::new(stream.try_clone()?);
-        // buf_reader.read_until(b'\n',&mut vec_buf)?;
-        // dbg!(vec_buf);
-        let http = RequestHeader::new(String::from_utf8_lossy(&buf).to_string());
+        let mut buf = Vec::with_capacity(1024);
+        // stream.read(&mut buf)?;
+        stream.read_to_end(&mut buf)?; //TODO don't need to read the full stream
+        
+        let http = RequestHeader::new(String::from_utf8_lossy(&buf).to_string()); // TODO utf8_lossy may cause the content-length mismatch
+        dbg!(http.get_content_length());
         let code = 0;
         let path = http.get_path();
         let path = if path == "/" {
