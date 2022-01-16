@@ -41,6 +41,7 @@ impl FileServer {
         // stream.read(&mut buf)?;
         stream.read_to_end(&mut buf)?; //TODO don't need to read the full stream
         
+        // TODO use lifetime &str to avoid string cloning.
         let http = RequestHeader::new(String::from_utf8_lossy(&buf).to_string()); // TODO utf8_lossy may cause the content-length mismatch
         dbg!(http.get_content_length());
         let code = 0;
