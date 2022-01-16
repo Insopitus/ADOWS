@@ -35,7 +35,6 @@ impl FolderReader{
     }
     pub fn get_file_as_string(&self,dir:&str)->Result<String,io::Error>{
         let file_path = self.get_full_path_from_relative(dir);
-        println!("{}",file_path);
         fs::read_to_string(file_path)
     }
     /// recursively enumerate all the files in the path

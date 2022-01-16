@@ -1,22 +1,19 @@
 use std::{
-    fs,
-    io::{self, Read, Write},
+    io::{self, Read, Write, BufRead, BufReader},
     net::{TcpListener, TcpStream},
 };
 
-use crate::mods::http_header::HTTPHeader;
+use super::http_header::RequestHeader;
 
 use super::folder_reader::FolderReader;
 
 pub struct FileServer {
-    listener: Option<TcpListener>,
     reader: FolderReader,
 }
 
 impl FileServer {
     pub fn new(reader: FolderReader) -> FileServer {
         FileServer {
-            listener: None,
             reader,
         }
     }
@@ -42,15 +39,18 @@ impl FileServer {
     fn handle_connection(&self, mut stream: TcpStream) -> Result<(), std::io::Error> {
         let mut buf = [0u8; 1024]; //TODO accept arbitrary length
         stream.read(&mut buf)?;
-        let http = HTTPHeader::new(String::from_utf8_lossy(&buf).to_string());
+        // let mut vec_buf:Vec<u8> = Vec::with_capacity(64);
+        // let mut buf_reader = BufReader::new(stream.try_clone()?);
+        // buf_reader.read_until(b'\n',&mut vec_buf)?;
+        // dbg!(vec_buf);
+        let http = RequestHeader::new(String::from_utf8_lossy(&buf).to_string());
         let code = 0;
         let path = http.get_path();
         let path = if path == "/" {
-          "index.html"
+          "index.html" // redirect if path is empty
         }else{
           path
         };
-        println!("{}",path);
         let contents = self.reader.get_file_as_string(path)?;
         // let status_line = "HTTP/1.1 200 OK";
         // let contents = "<h1>Hi</h1>";
