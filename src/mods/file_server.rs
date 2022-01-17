@@ -45,7 +45,6 @@ impl FileServer {
         }
         // stream.read(&mut buf)?; //TODO don't need to read the full stream
 
-        // TODO use lifetime &str to avoid string cloning.
         let http = RequestHeader::new(string);
         let code;
         let path = http.get_path();
