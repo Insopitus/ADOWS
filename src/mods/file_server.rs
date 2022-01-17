@@ -41,11 +41,11 @@ impl FileServer {
         loop {
             let line_size = reader.read_line(&mut string)?;
             if line_size == 2 {
-                break //break at the end of the header (an empty line with only b'\r\n')
+                break; //break at the end of the header (an empty line with only b'\r\n')
             }
         }
         // stream.read(&mut buf)?; //TODO don't need to read the full stream
-       
+
         // TODO use lifetime &str to avoid string cloning.
         let http = RequestHeader::new(string); // TODO utf8_lossy may cause the content-length mismatch
         let code;
@@ -55,19 +55,19 @@ impl FileServer {
         } else {
             path
         };
-        let contents: String;
-        match self.reader.get_file_as_string(path) {
+        let mut contents: Vec<u8>;
+        match self.reader.get_file_as_binary(path) {
             Ok(str) => {
                 contents = str;
                 code = 200;
             }
             Err(err) => {
-                contents = "404".to_string();
+                contents = "404".as_bytes().into();
                 code = 404;
             }
         }
-        println!("Request {}: {}",path, code);
-        FileServer::send_response(stream, code, contents)?;
+        println!("Request {}: {}", path, code);
+        FileServer::send_response(stream, code, &mut contents)?;
 
         // let status_line = "HTTP/1.1 200 OK";
         // let contents = "<h1>Hi</h1>";
@@ -76,7 +76,7 @@ impl FileServer {
     pub fn send_response(
         mut stream: TcpStream,
         code: u32,
-        contents: String,
+        contents: &mut Vec<u8>,
     ) -> Result<(), std::io::Error> {
         let status_line = if code == 200 {
             "HTTP/1.1 200 OK"
@@ -85,13 +85,15 @@ impl FileServer {
         } else {
             "HTTP/1.1 404 NOT FOUND"
         };
-        let response = format!(
-            "{}\r\nContent-Length: {}\r\n\r\n{}",
+        let response_header = format!(
+            "{}\r\nContent-Length: {}\r\n\r\n",
             status_line,
             contents.len(),
-            contents
         );
-        stream.write_all(response.as_bytes())?;
+        let mut response = Vec::with_capacity(response_header.len()+contents.len());
+        response.append(&mut response_header.as_bytes().into());
+        response.append(contents);
+        stream.write_all(&response)?;
         stream.flush()?;
         // println!("Response sent: \r\n{}\r\n", response);
         Ok(())
