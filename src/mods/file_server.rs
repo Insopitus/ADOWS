@@ -1,5 +1,5 @@
 use std::{
-    io::{self, Read, Write, BufRead, BufReader},
+    io::{self, BufRead, BufReader, Read, Write},
     net::{TcpListener, TcpStream},
 };
 
@@ -13,9 +13,7 @@ pub struct FileServer {
 
 impl FileServer {
     pub fn new(reader: FolderReader) -> FileServer {
-        FileServer {
-            reader,
-        }
+        FileServer { reader }
     }
     pub fn listen(&mut self, port: i32) -> Result<(), io::Error> {
         let listener = TcpListener::bind(format!("127.0.0.1:{}", &port))?;
@@ -27,7 +25,7 @@ impl FileServer {
         //     FileServer::handle_connection(stream);
         // }
         for stream in listener.incoming() {
-            println!("Request incoming.");
+            // println!("Request incoming.");
 
             let stream = stream?;
             self.handle_connection(stream)?;
@@ -37,24 +35,42 @@ impl FileServer {
     }
     pub fn get_file_from_request(&self) {}
     fn handle_connection(&self, mut stream: TcpStream) -> Result<(), std::io::Error> {
-        let mut buf = Vec::with_capacity(1024);
-        // stream.read(&mut buf)?;
-        stream.read_to_end(&mut buf)?; //TODO don't need to read the full stream
-        
+        let mut reader = BufReader::new(stream.try_clone()?);
+        let mut string = String::with_capacity(512);
+        // reader.read_line(&mut string)?;
+        loop {
+            let line_size = reader.read_line(&mut string)?;
+            if line_size == 2 {
+                break //break at the end of the header (an empty line with only b'\r\n')
+            }
+        }
+        // stream.read(&mut buf)?; //TODO don't need to read the full stream
+       
         // TODO use lifetime &str to avoid string cloning.
-        let http = RequestHeader::new(String::from_utf8_lossy(&buf).to_string()); // TODO utf8_lossy may cause the content-length mismatch
-        dbg!(http.get_content_length());
-        let code = 0;
+        let http = RequestHeader::new(string); // TODO utf8_lossy may cause the content-length mismatch
+        let code;
         let path = http.get_path();
         let path = if path == "/" {
-          "index.html" // redirect if path is empty
-        }else{
-          path
+            "index.html" // redirect if path is empty
+        } else {
+            path
         };
-        let contents = self.reader.get_file_as_string(path)?;
+        let contents: String;
+        match self.reader.get_file_as_string(path) {
+            Ok(str) => {
+                contents = str;
+                code = 200;
+            }
+            Err(err) => {
+                contents = "404".to_string();
+                code = 404;
+            }
+        }
+        println!("Request {}: {}",path, code);
+        FileServer::send_response(stream, code, contents)?;
+
         // let status_line = "HTTP/1.1 200 OK";
         // let contents = "<h1>Hi</h1>";
-        FileServer::send_response(stream, code, contents)?;
         Ok(())
     }
     pub fn send_response(
@@ -75,9 +91,9 @@ impl FileServer {
             contents.len(),
             contents
         );
-        stream.write(response.as_bytes())?;
+        stream.write_all(response.as_bytes())?;
         stream.flush()?;
-        println!("Response sent: \r\n{}\r\n", response);
+        // println!("Response sent: \r\n{}\r\n", response);
         Ok(())
     }
 }

@@ -37,6 +37,10 @@ impl FolderReader{
         let file_path = self.get_full_path_from_relative(dir);
         fs::read_to_string(file_path)
     }
+    pub fn get_file_as_binary(&self,dir:&str)->Result<Vec<u8>,io::Error>{
+        let file_path = self.get_full_path_from_relative(dir);
+        fs::read(file_path)
+    }
     /// recursively enumerate all the files in the path
     fn visit_dir(&self,path: &Path, info: &mut String) -> Result<(), std::io::Error> {
         for entry in read_dir(path)? {

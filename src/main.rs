@@ -26,7 +26,7 @@ fn main() {
     let mut server = FileServer::new(fr);
     server
         .listen(8080)
-        .expect("io error happend to file server");
+        .expect("Error occured. Server is closing.");
     println!("Press Enter to continue.");
     std::io::stdin().read_line(&mut String::new()).unwrap();
 }
