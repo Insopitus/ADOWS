@@ -1,5 +1,5 @@
 use std::{
-    io::{self, BufRead, BufReader, Read, Write},
+    io::{self, BufRead, BufReader, Write},
     net::{TcpListener, TcpStream},
 };
 
@@ -33,8 +33,7 @@ impl FileServer {
         // }
         Ok(())
     }
-    pub fn get_file_from_request(&self) {}
-    fn handle_connection(&self, mut stream: TcpStream) -> Result<(), std::io::Error> {
+    fn handle_connection(&self, stream: TcpStream) -> Result<(), std::io::Error> {
         let mut reader = BufReader::new(stream.try_clone()?);
         let mut string = String::with_capacity(512);
         // reader.read_line(&mut string)?;
@@ -47,7 +46,7 @@ impl FileServer {
         // stream.read(&mut buf)?; //TODO don't need to read the full stream
 
         // TODO use lifetime &str to avoid string cloning.
-        let http = RequestHeader::new(string); // TODO utf8_lossy may cause the content-length mismatch
+        let http = RequestHeader::new(string);
         let code;
         let path = http.get_path();
         let path = if path == "/" {
@@ -61,10 +60,20 @@ impl FileServer {
                 contents = str;
                 code = 200;
             }
-            Err(err) => {
-                contents = "404".as_bytes().into();
-                code = 404;
-            }
+            Err(err) => match err.kind() {
+                io::ErrorKind::NotFound => {
+                    contents = "Not Found".as_bytes().into();
+                    code = 404;
+                }
+                io::ErrorKind::PermissionDenied => {
+                    contents = "Forbiden".as_bytes().into();
+                    code = 403;
+                }
+                _ => {
+                    contents = "Forbiden".as_bytes().into();
+                    code = 403;
+                }
+            },
         }
         println!("Request {}: {}", path, code);
         FileServer::send_response(stream, code, &mut contents)?;
@@ -90,7 +99,7 @@ impl FileServer {
             status_line,
             contents.len(),
         );
-        let mut response = Vec::with_capacity(response_header.len()+contents.len());
+        let mut response = Vec::with_capacity(response_header.len() + contents.len());
         response.append(&mut response_header.as_bytes().into());
         response.append(contents);
         stream.write_all(&response)?;
