@@ -56,8 +56,8 @@ impl FileServer {
         };
         let mut contents: Vec<u8>;
         match self.reader.get_file_as_binary(path) {
-            Ok(str) => {
-                contents = str;
+            Ok(bytes) => {
+                contents = bytes;
                 code = 200;
             }
             Err(err) => match err.kind() {
