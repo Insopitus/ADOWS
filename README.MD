@@ -6,7 +6,7 @@ A small project you can drag a folder or file onto the exe to start a web server
 
 ## Usage
 
-Drag a folder that contains a `index.html` file at its root onto the exe file
+Drag a folder that contains a `index.html` file at its root onto the `drag_in_web_server.exe` file in the release page.
 
 ## Misc
 
