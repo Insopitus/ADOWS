@@ -17,3 +17,4 @@ TODO:
 3. URL decoding
 4. long time inactive 
 5. concurrency
+6. error recovery

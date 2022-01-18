@@ -39,12 +39,16 @@ impl FileServer {
         // reader.read_line(&mut string)?;
         loop {
             let line_size = reader.read_line(&mut string)?;
-            if line_size == 2 {
+            // println!("line size: {}",&line_size);
+            if line_size <= 2 {
                 break; //break at the end of the header (an empty line with only b'\r\n')
             }
         }
-        // stream.read(&mut buf)?; //TODO don't need to read the full stream
-
+        // don't know why there are empty requests, but it's nessasary to handle it.
+        if string.len() == 0 {
+            FileServer::send_response(stream, 400, &mut "Bad Request".as_bytes().into())?;
+            return Ok(())
+        }
         let http = RequestHeader::new(string);
         let code;
         let path = http.get_path();
@@ -74,7 +78,7 @@ impl FileServer {
                 }
             },
         }
-        println!("Request {}: {}", path, code);
+        println!("Request: {} - {}", path, code);
         FileServer::send_response(stream, code, &mut contents)?;
 
         // let status_line = "HTTP/1.1 200 OK";

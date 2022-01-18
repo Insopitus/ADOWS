@@ -7,7 +7,7 @@ use std::collections::HashMap;
 /// 2. header fields
 /// 3. body (if needed)
 /// reference: https://www.ibm.com/docs/en/cics-ts/5.3?topic=protocol-http-requests
-/// this structure covers the first two part (so called header)
+/// this structure covers the first two parts (so called header)
 pub struct RequestHeader {
     orginal_string: String,
     path: String,
