@@ -35,7 +35,8 @@ impl FileServer {
     }
     fn handle_connection(&self, stream: TcpStream) -> Result<(), std::io::Error> {
         let mut reader = BufReader::new(stream.try_clone()?);
-        let mut string = String::with_capacity(512);
+        let mut string = String::with_capacity(1024);
+        
         // reader.read_line(&mut string)?;
         loop {
             let line_size = reader.read_line(&mut string)?;
@@ -90,6 +91,7 @@ impl FileServer {
         code: u32,
         contents: &mut Vec<u8>,
     ) -> Result<(), std::io::Error> {
+        // TODO write a response header structure to orgnize the response
         let status_line = if code == 200 {
             "HTTP/1.1 200 OK"
         } else if code == 404 {

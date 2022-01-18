@@ -1,20 +1,29 @@
 # A Drag-In Web Server (WIP)
 
-A small project you can drag a folder or file into the exe to start a web server hosting the folder.
+## Description
 
-This project is for learning and practising purpose only. So I will try not to use any third-party libraries (crates).
+A small project you can drag a folder or file onto the exe to start a web server hosting the folder.
 
-Currently, things needed to be implemented:
+## Usage
+
+Drag a folder that contains a `index.html` file at its root onto the exe file
+
+## Misc
+
+This project is for learning and practising purpose mainly, which means I will try not to use any third-party libraries (crates).
+
+As a result, the server could be cranky and would never go anywhere near production standard.
+
+features implemented:
 1. TCP connection handling;
 2. HTTP header parsing;
 3. file reading;
-4. url decoding(percent-encoding);
-5. MIME types;
 
-TODO:
+## Todos:
 1. use a new port if the current port is in use
 2. MIME types
-3. URL decoding
-4. long time inactive 
+3. URL decoding(non ASCII file names)
 5. concurrency
 6. error recovery
+7. cache
+8. relative path (../)
