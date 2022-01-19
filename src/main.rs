@@ -2,7 +2,7 @@ use std::{env, io};
 // use std::io::Write;
 use std::path::Path;
 
-mod mods;
+pub mod mods;
 use mods::{file_server::FileServer, folder_reader::FolderReader};
 
 fn main() {
