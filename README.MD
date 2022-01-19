@@ -11,7 +11,7 @@ You can also put `ADOWS.exe` in the target folder and run it to host the folder 
 
 ## Limitations
 
-1. the directroy name and file names should not contain non-ASCII characters, or ADOWS cannot find the target file. It will be fixed when I got the URL decoding done.
+1. the directroy name and file names should not contain non-ASCII characters, or ADOWS cannot find the target file. It will be fixed when I finish the URL decoding function.
 
 ## Misc
 
