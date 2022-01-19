@@ -25,8 +25,10 @@ impl RequestHeader {
         // dbg!(line_one);
         // request line (first line)
         let (method, path, version) = RequestHeader::parse_request_line(line_one);
-        let header_fields =
-            RequestHeader::parse_header_fields(&mut lines);
+        let header_fields = RequestHeader::parse_header_fields(&mut lines);
+        if method == "" || path == "" || version == "" {
+            return None;
+        }
         Some(RequestHeader {
             orginal_string: original_string,
             path,
@@ -56,18 +58,9 @@ impl RequestHeader {
     }
     fn parse_request_line(line_one: &str) -> (String, String, String) {
         let mut line_one_iter = line_one.split(" ");
-        let method = line_one_iter
-            .next()
-            .expect("Invalid HTTP Content.")
-            .to_string();
-        let path = line_one_iter
-            .next()
-            .expect("Invalid HTTP Content.")
-            .to_string(); //TODO remove query strings
-        let version = line_one_iter
-            .next()
-            .expect("Invalid HTTP Content.")
-            .to_string();
+        let method = line_one_iter.next().unwrap_or("").to_string();
+        let path = line_one_iter.next().unwrap_or("").to_string(); //TODO remove query strings
+        let version = line_one_iter.next().unwrap_or("").to_string();
         (method, path, version)
     }
     fn parse_header_fields(lines: &mut Split<&str>) -> HashMap<String, String> {
