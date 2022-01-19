@@ -1,8 +1,8 @@
-# A Drag-In Web Server (WIP)
+# ADOWS, A Drag-Onto Web Server.
 
 ## Description
 
-A small project you can drag a folder or file onto the exe to start a web server hosting the folder.
+ADOWS is a small program that you can drag-drop your static webpage file folder to it to start a web server that hosts your webpage.
 
 ## Usage
 
