@@ -16,24 +16,24 @@ pub struct RequestHeader {
     header_fields: HashMap<String, String>,
 }
 impl RequestHeader {
-    pub fn new(string: String) -> Self {
+    pub fn new(string: String) -> Option<Self> {
         let original_string = string.to_owned();
         // println!("{}", &original_string);
         let mut lines = string.split("\r\n"); // http headers are separeted by CRLFs
         let line_one = lines.nth(0);
-        let line_one = line_one.expect("Invalid HTTP Content.");
+        let line_one = line_one?;
         // dbg!(line_one);
         // request line (first line)
         let (method, path, version) = RequestHeader::parse_request_line(line_one);
         let header_fields =
-            RequestHeader::parse_header_fields(&mut lines).expect("invalid HTTP header");
-        RequestHeader {
+            RequestHeader::parse_header_fields(&mut lines);
+        Some(RequestHeader {
             orginal_string: original_string,
             path,
             method,
             version,
             header_fields,
-        }
+        })
     }
     pub fn get_method(&self) -> &String {
         &self.method
@@ -70,7 +70,7 @@ impl RequestHeader {
             .to_string();
         (method, path, version)
     }
-    fn parse_header_fields(lines: &mut Split<&str>) -> Option<HashMap<String, String>> {
+    fn parse_header_fields(lines: &mut Split<&str>) -> HashMap<String, String> {
         let mut map = HashMap::new();
         loop {
             let line = lines.next();
@@ -81,8 +81,16 @@ impl RequestHeader {
                         let mut split = l.split(":");
                         // dbg!(&split.collect::<Vec<_>>());
 
-                        let k = split.next()?.trim().to_owned();
-                        let v = split.next()?.trim().to_owned();
+                        let k = split.next();
+                        if k == None {
+                            continue;
+                        }
+                        let k = k.unwrap().to_owned();
+                        let v = split.next();
+                        if v == None {
+                            continue;
+                        }
+                        let v = v.unwrap().to_owned();
 
                         map.insert(k, v);
                     }
@@ -90,6 +98,6 @@ impl RequestHeader {
                 None => break,
             }
         }
-        Some(map)
+        map
     }
 }

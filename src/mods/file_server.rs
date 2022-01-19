@@ -36,7 +36,7 @@ impl FileServer {
     fn handle_connection(&self, stream: TcpStream) -> Result<(), std::io::Error> {
         let mut reader = BufReader::new(stream.try_clone()?);
         let mut string = String::with_capacity(1024);
-        
+
         // reader.read_line(&mut string)?;
         loop {
             let line_size = reader.read_line(&mut string)?;
@@ -45,42 +45,42 @@ impl FileServer {
                 break; //break at the end of the header (an empty line with only b'\r\n')
             }
         }
-        // don't know why there are empty requests, but it's nessasary to handle it.
-        if string.len() == 0 {
-            FileServer::send_response(stream, 400, &mut "Bad Request".as_bytes().into())?;
-            return Ok(())
-        }
-        let http = RequestHeader::new(string);
-        let code;
-        let path = http.get_path();
-        let path = if path == "/" {
-            "index.html" // redirect if path is empty
-        } else {
-            path
-        };
-        let mut contents: Vec<u8>;
-        match self.reader.get_file_as_binary(path) {
-            Ok(bytes) => {
-                contents = bytes;
-                code = 200;
+
+        let header = RequestHeader::new(string);
+        if let Some(header) = header {
+            let code;
+            let path = header.get_path();
+            let path = if path == "/" {
+                "index.html" // redirect if path is empty
+            } else {
+                path
+            };
+            let mut contents: Vec<u8>;
+            match self.reader.get_file_as_binary(path) {
+                Ok(bytes) => {
+                    contents = bytes;
+                    code = 200;
+                }
+                Err(err) => match err.kind() {
+                    io::ErrorKind::NotFound => {
+                        contents = "Not Found".as_bytes().into();
+                        code = 404;
+                    }
+                    io::ErrorKind::PermissionDenied => {
+                        contents = "Forbiden".as_bytes().into();
+                        code = 403;
+                    }
+                    _ => {
+                        contents = "Forbiden".as_bytes().into();
+                        code = 403;
+                    }
+                },
             }
-            Err(err) => match err.kind() {
-                io::ErrorKind::NotFound => {
-                    contents = "Not Found".as_bytes().into();
-                    code = 404;
-                }
-                io::ErrorKind::PermissionDenied => {
-                    contents = "Forbiden".as_bytes().into();
-                    code = 403;
-                }
-                _ => {
-                    contents = "Forbiden".as_bytes().into();
-                    code = 403;
-                }
-            },
+            println!("Request: {} - {}", path, code);
+            FileServer::send_response(stream, code, &mut contents)?;
+        } else {
+            FileServer::send_response(stream, 400, &mut "Bad Request".as_bytes().into())?;
         }
-        println!("Request: {} - {}", path, code);
-        FileServer::send_response(stream, code, &mut contents)?;
 
         // let status_line = "HTTP/1.1 200 OK";
         // let contents = "<h1>Hi</h1>";
