@@ -26,7 +26,6 @@ features implemented:
 4. MIME type support for main media types;
 
 ## Todos:
-1. use a new port if the current port is in use
 3. URL decoding(non ASCII file names)
 5. concurrency
 6. error recovery
