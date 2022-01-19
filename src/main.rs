@@ -7,9 +7,10 @@ use mods::{file_server::FileServer, folder_reader::FolderReader};
 
 fn main() {
     // println!("Hello, world!");
-    let path_arg = env::args().skip(1).next().unwrap();
+    let current_dir = env::current_dir().unwrap().to_string_lossy().to_string();
+    let path = env::args().skip(1).next().unwrap_or(current_dir);
+    let path = Path::new(&path);
     // let mut info = String::new();
-    let path = Path::new(&path_arg);
     // if path.is_dir() {
     //     visit_dir(path, &mut info).unwrap();
     // } else if path.is_file() {
