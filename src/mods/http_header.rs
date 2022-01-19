@@ -15,6 +15,7 @@ pub struct RequestHeader {
     header_fields: HashMap<String, String>,
 }
 impl RequestHeader {
+    /// returns `None` if the string is not a valid http request header
     pub fn new(string: String) -> Option<Self> {
         // println!("{}", &original_string);
         let mut lines = string.split("\r\n"); // http headers are separeted by CRLFs
@@ -25,14 +26,16 @@ impl RequestHeader {
         let (method, path, version) = RequestHeader::parse_request_line(line_one);
         let header_fields = RequestHeader::parse_header_fields(&mut lines);
         if method == "" || path == "" || version == "" {
-            return None;
+            None
+        }else{
+            Some(RequestHeader {
+                path,
+                method,
+                version,
+                header_fields,
+            })
         }
-        Some(RequestHeader {
-            path,
-            method,
-            version,
-            header_fields,
-        })
+        
     }
     pub fn get_method(&self) -> &String {
         &self.method
