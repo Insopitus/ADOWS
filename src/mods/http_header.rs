@@ -9,7 +9,6 @@ use std::collections::HashMap;
 /// reference: https://www.ibm.com/docs/en/cics-ts/5.3?topic=protocol-http-requests
 /// this structure covers the first two parts (so called header)
 pub struct RequestHeader {
-    orginal_string: String,
     path: String,
     method: String,
     version: String,
@@ -17,7 +16,6 @@ pub struct RequestHeader {
 }
 impl RequestHeader {
     pub fn new(string: String) -> Option<Self> {
-        let original_string = string.to_owned();
         // println!("{}", &original_string);
         let mut lines = string.split("\r\n"); // http headers are separeted by CRLFs
         let line_one = lines.nth(0);
@@ -30,7 +28,6 @@ impl RequestHeader {
             return None;
         }
         Some(RequestHeader {
-            orginal_string: original_string,
             path,
             method,
             version,
