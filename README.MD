@@ -21,7 +21,6 @@ features implemented:
 
 ## Todos:
 1. use a new port if the current port is in use
-2. MIME types (es module loading needs strict MIME type)
 3. URL decoding(non ASCII file names)
 5. concurrency
 6. error recovery
