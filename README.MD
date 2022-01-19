@@ -6,7 +6,12 @@ ADOWS is a small program that you can drag-drop your static webpage file folder 
 
 ## Usage
 
-Drag a folder that contains a `index.html` file at its root onto the `drag_in_web_server.exe` file in the release page.
+Drag a folder that contains a `index.html` file at its root onto the `ADOWS.exe` file in the release page.
+You can also put `ADOWS.exe` in the target folder and run it to host the folder it's in.
+
+## Limitations
+
+1. the directroy name and file names should not contain non-ASCII characters, or ADOWS cannot find the target file. It will be fixed when I got the URL decoding done.
 
 ## Misc
 
@@ -18,6 +23,7 @@ features implemented:
 1. TCP connection handling;
 2. HTTP header parsing;
 3. file reading;
+4. MIME type support for main media types;
 
 ## Todos:
 1. use a new port if the current port is in use
