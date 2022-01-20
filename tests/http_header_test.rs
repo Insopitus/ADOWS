@@ -1,4 +1,4 @@
-use ADOWS::mods::http_header::RequestHeader;
+use adows::mods::http_header::RequestHeader;
 
 
 #[test]
