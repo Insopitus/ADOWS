@@ -9,6 +9,7 @@ impl MediaType {
       map.insert("html".to_string(), "text/html".to_string());
       map.insert("css".to_string(), "text/css".to_string());
       map.insert("js".to_string(), "text/javascript".to_string());
+      map.insert("ts".to_string(), "text/javascript".to_string());
 
       map.insert("jpg".to_string(), "image/jpeg".to_string());
       map.insert("jpeg".to_string(), "image/jpeg".to_string());
