@@ -2,8 +2,9 @@ use std::{env, io};
 // use std::io::Write;
 use std::path::Path;
 
-pub mod mods;
-use mods::{file_server::FileServer, folder_reader::FolderReader};
+use adows::mods::file_server::FileServer;
+use adows::mods::folder_reader::FolderReader;
+
 
 fn main() {
     // println!("Hello, world!");
@@ -31,7 +32,6 @@ fn main() {
         }
       }
     }
-
     println!("Press Enter to continue.");
     std::io::stdin().read_line(&mut String::new()).unwrap();
 }

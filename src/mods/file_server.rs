@@ -11,23 +11,24 @@ use super::media_type::MediaType;
 
 pub struct FileServer {
     reader: FolderReader,
-    media_type_map:MediaType
+    media_type_map: MediaType,
 }
 
 impl FileServer {
     pub fn new(reader: FolderReader) -> FileServer {
         let media_type_map = MediaType::new();
-        FileServer { reader,media_type_map }
+        FileServer {
+            reader,
+            media_type_map,
+        }
     }
     pub fn listen(&mut self, port: i32) -> Result<(), io::Error> {
         let listener = TcpListener::bind(format!("127.0.0.1:{}", &port))?;
         println!("Server listening at http://localhost:{}", &port);
-        // self.listener = Some(listener);
-        // if let Some(listener) = listener {
-        // loop {
-        //     let (stream, addr) = listener.accept()?;
-        //     FileServer::handle_connection(stream);
-        // }
+        std::process::Command::new("cmd.exe")
+            .arg("/C")
+            .arg("start")
+            .arg(format!("http://localhost:{}", port)).spawn();
         for stream in listener.incoming() {
             // println!("Request incoming.");
 
@@ -62,9 +63,13 @@ impl FileServer {
             let mime_type;
             let suffix = path.split(".").last();
             if let Some(suffix) = suffix {
-              mime_type = self.media_type_map.get_mime_type(suffix).unwrap_or(&String::new()).to_owned();
-            }else{
-              mime_type = String::new();
+                mime_type = self
+                    .media_type_map
+                    .get_mime_type(suffix)
+                    .unwrap_or(&String::new())
+                    .to_owned();
+            } else {
+                mime_type = String::new();
             }
             let mut contents: Vec<u8>;
             match self.reader.get_file_as_binary(path) {
@@ -88,9 +93,14 @@ impl FileServer {
                 },
             }
             println!("Request: {} - {}", path, code);
-            FileServer::send_response(stream, code,mime_type ,&mut contents)?;
+            FileServer::send_response(stream, code, mime_type, &mut contents)?;
         } else {
-            FileServer::send_response(stream, 400, String::new(),&mut "Bad Request".as_bytes().into())?;
+            FileServer::send_response(
+                stream,
+                400,
+                String::new(),
+                &mut "Bad Request".as_bytes().into(),
+            )?;
         }
 
         // let status_line = "HTTP/1.1 200 OK";
@@ -100,7 +110,7 @@ impl FileServer {
     pub fn send_response(
         mut stream: TcpStream,
         code: u32,
-        media_type:String,
+        media_type: String,
         contents: &mut Vec<u8>,
     ) -> Result<(), std::io::Error> {
         // TODO write a response header structure to orgnize the response
@@ -114,12 +124,9 @@ impl FileServer {
         let mut response_header = String::new();
         response_header.push_str(status_line);
         if media_type != "" {
-          response_header.push_str(format!("\r\nContent-Type: {}\r\n",media_type).as_str());
+            response_header.push_str(format!("\r\nContent-Type: {}\r\n", media_type).as_str());
         }
-        response_header.push_str(format!(
-            "Content-Length: {}\r\n\r\n",
-            contents.len(),
-        ).as_str());
+        response_header.push_str(format!("Content-Length: {}\r\n\r\n", contents.len(),).as_str());
         let mut response = Vec::with_capacity(response_header.len() + contents.len());
         response.append(&mut response_header.as_bytes().into());
         response.append(contents);
