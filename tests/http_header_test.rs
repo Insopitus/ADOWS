@@ -1,5 +1,10 @@
-use adows::mods::http_header::RequestHeader;
+use adows::mods::request_header::RequestHeader;
 
+#[test]
+fn standard_request_line(){
+  let string = String::from("GET /index.html HTTP/1.1");
+  assert!(RequestHeader::new(string).is_some());
+}
 
 #[test]
 fn empty_string_test() {
@@ -17,3 +22,13 @@ fn bad_request_line(){
 //   let string = String::from("HTTP/1.1 GET A");
 //   assert!(RequestHeader::new(string).is_none());
 // }
+
+#[test]
+fn query_strings(){
+  let string = String::from("GET /script/m.js?v=1 HTTP/1.1");
+  let header = RequestHeader::new(string);
+  assert!(header.is_some());
+  let header = header.unwrap();
+  let path = header.get_path();
+  assert_eq!(path,"/script/m.js");
+}
