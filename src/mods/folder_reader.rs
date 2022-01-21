@@ -10,7 +10,7 @@ impl FolderReader{
         if metadata.is_dir() {
             root_path = path.to_str().unwrap().to_string();
         }else{
-            let str = path.to_str().unwrap();
+            let str = path.to_str().unwrap(); // TODO error handling
             let mut a =str.split("\\").collect::<Vec<&str>>();
             a.pop();
             

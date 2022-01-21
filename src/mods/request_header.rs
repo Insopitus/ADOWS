@@ -1,6 +1,8 @@
 use core::str::Split;
 use std::collections::HashMap;
 
+use super::utils::percent_decode;
+
 /// An HTTP Request parser
 /// 
 /// An HTTP Requset is made up of three parts:
@@ -70,6 +72,7 @@ impl RequestHeader {
             .unwrap_or("")
             .to_string(); // remove query strings
             // TODO url decoding
+        let path = percent_decode(&path);
         let version = line_one_iter.next().unwrap_or("").to_string();
         (method, path, version)
     }

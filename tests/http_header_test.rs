@@ -32,3 +32,13 @@ fn query_strings(){
   let path = header.get_path();
   assert_eq!(path,"/script/m.js");
 }
+
+#[test]
+fn uri_encoded() {
+  let string = String::from("GET /script/%E4%B8%AD%E6%96%87.js HTTP/1.1");
+  let header = RequestHeader::new(string);
+  assert!(header.is_some());
+  let header = header.unwrap();
+  let path = header.get_path();
+  assert_eq!(path,"/script/中文.js");
+}
