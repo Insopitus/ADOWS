@@ -1,10 +1,16 @@
 pub mod mods;
 use std::{
     io::{self, BufRead, BufReader, Write},
-    net::{TcpListener, TcpStream}, path::Path,
+    net::{TcpListener, TcpStream},
+    path::Path,
 };
 
-use mods::{folder_reader::FolderReader, media_type::MediaType, request_header::RequestHeader};
+use mods::{
+    folder_reader::FolderReader,
+    media_type::MediaType,
+    request_header::RequestHeader,
+    response_header::ResponseHeader,
+};
 
 pub struct FileServer {
     reader: FolderReader,
@@ -12,7 +18,7 @@ pub struct FileServer {
 }
 
 impl FileServer {
-    pub fn new(path:&Path) -> FileServer {
+    pub fn new(path: &Path) -> FileServer {
         let reader = FolderReader::new(path);
         let media_type_map = MediaType::new();
         FileServer {
@@ -27,7 +33,8 @@ impl FileServer {
             .arg("/C")
             .arg("start")
             .arg(format!("http://localhost:{}", port))
-            .spawn().ok();
+            .spawn()
+            .ok();
         for stream in listener.incoming() {
             let stream = stream?;
             self.handle_connection(stream)?;
@@ -111,25 +118,17 @@ impl FileServer {
         contents: &mut Vec<u8>,
     ) -> Result<(), std::io::Error> {
         // TODO write a response header structure to orgnize the response
-        let status_line = if code == 200 {
-            "HTTP/1.1 200 OK"
-        } else if code == 404 {
-            "HTTP/1.1 404 NOT FOUND"
-        } else {
-            "HTTP/1.1 404 NOT FOUND"
-        };
-        let mut response_header = String::new();
-        response_header.push_str(status_line);
+        let mut response_header = ResponseHeader::new(code);
         if media_type != "" {
-            response_header.push_str(format!("\r\nContent-Type: {}\r\n", media_type).as_str());
+            response_header.insert_field("Content-Type".to_string(), media_type.to_string());
         }
-        response_header.push_str(format!("Content-Length: {}\r\n\r\n", contents.len(),).as_str());
+        response_header.insert_field("Content-Length".to_string(), contents.len().to_string());
+        let response_header = response_header.to_string();
         let mut response = Vec::with_capacity(response_header.len() + contents.len());
         response.append(&mut response_header.as_bytes().into());
         response.append(contents);
         stream.write_all(&response)?;
         stream.flush()?;
-        // println!("Response sent: \r\n{}\r\n", response);
         Ok(())
     }
 }
