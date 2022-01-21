@@ -7,7 +7,7 @@ fn standard_request_line(){
 }
 
 #[test]
-fn empty_string_test() {
+fn empty_string() {
     let header = RequestHeader::new(String::new());
     assert!(header.is_none());
 }

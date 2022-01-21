@@ -12,9 +12,8 @@ fn decode_reserved_characters(){
     let string = "%7B%22a%22:1,%22b%22:%22bar%22%7D";
     assert_eq!(percent_decode(string),"{\"a\":1,\"b\":\"bar\"}");
 }
-// TODO
-// #[test]
-// fn decode_none_percent_encoded(){
-//     let string = "%7s";
-//     assert_eq!(percent_decode(string),"%7s");
-// }
+#[test]
+fn decode_none_percent_encoded(){
+    let string = "%7s";
+    assert_eq!(percent_decode(string),"%7s");
+}
