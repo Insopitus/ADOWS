@@ -42,12 +42,12 @@ impl FolderReader{
         fs::read(file_path)
     }
     /// recursively enumerate all the files in the path
-    fn visit_dir(&self,path: &Path, info: &mut String) -> Result<(), std::io::Error> {
+    fn _visit_dir(&self,path: &Path, info: &mut String) -> Result<(), std::io::Error> {
         for entry in read_dir(path)? {
             let entry = entry?;
             let dir = entry.path();
             if dir.is_dir() {
-                self.visit_dir(&dir, info)?;
+                self._visit_dir(&dir, info)?;
             } else if let Some(str) = dir.to_str() {
                 info.push_str(str);
                 info.push_str("\n")

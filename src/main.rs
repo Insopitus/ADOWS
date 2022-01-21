@@ -4,9 +4,11 @@ use std::path::Path;
 
 use adows::mods::file_server::FileServer;
 use adows::mods::folder_reader::FolderReader;
+use adows::mods::utils::ascii_to_hex;
 
 
 fn main() {
+ 
     // println!("Hello, world!");
     let current_dir = env::current_dir().unwrap().to_string_lossy().to_string();
     let path = env::args().skip(1).next().unwrap_or(current_dir);
