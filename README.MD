@@ -24,9 +24,9 @@ features implemented:
 2. HTTP header parsing;
 3. file reading;
 4. MIME type support for main media types;
+5. URI decode;
 
 ## Todos:
-3. URL decoding(non ASCII file names)
 5. concurrency
 6. error recovery
 7. cache
