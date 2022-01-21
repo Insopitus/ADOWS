@@ -1,17 +1,17 @@
 use std::collections::HashMap;
 
-use super::{utils::percent_decode, header_fields::HeaderFields};
+use super::{header_fields::HeaderFields, utils::percent_decode};
 
 /// An HTTP Request parser
-/// 
+///
 /// An HTTP Requset is made up of three parts:
-/// 
+///
 /// 1. a request line
 /// 2. header fields
 /// 3. body (if needed)
-/// 
+///
 /// reference: https://www.ibm.com/docs/en/cics-ts/5.3?topic=protocol-http-requests
-/// 
+///
 /// this structure covers the first two parts (so-called header)
 pub struct RequestHeader {
     path: String,
@@ -70,7 +70,7 @@ impl RequestHeader {
             .next()
             .unwrap_or("")
             .to_string(); // remove query strings
-            // TODO url decoding
+                          // TODO url decoding
         let path = percent_decode(&path);
         let version = line_one_iter.next().unwrap_or("").to_string();
         (method, path, version)
@@ -78,6 +78,52 @@ impl RequestHeader {
     fn parse_header_fields(s: String) -> HashMap<String, String> {
         let header_fields = HeaderFields::from(s);
         header_fields.table().to_owned()
-        
+    }
+}
+
+#[cfg(test)]
+mod test {
+  use super::RequestHeader;
+    #[test]
+    fn standard_request_line() {
+        let string = String::from("GET /index.html HTTP/1.1");
+        assert!(RequestHeader::new(string).is_some());
+    }
+
+    #[test]
+    fn empty_string() {
+        let header = RequestHeader::new(String::new());
+        assert!(header.is_none());
+    }
+
+    #[test]
+    fn bad_request_line() {
+        let string = String::from("HTTP/1.1 GET");
+        assert!(RequestHeader::new(string).is_none());
+    }
+    // #[test]
+    // fn bad_request_line_2(){
+    //   let string = String::from("HTTP/1.1 GET A");
+    //   assert!(RequestHeader::new(string).is_none());
+    // }
+
+    #[test]
+    fn query_strings() {
+        let string = String::from("GET /script/m.js?v=1 HTTP/1.1");
+        let header = RequestHeader::new(string);
+        assert!(header.is_some());
+        let header = header.unwrap();
+        let path = header.get_path();
+        assert_eq!(path, "/script/m.js");
+    }
+
+    #[test]
+    fn uri_encoded() {
+        let string = String::from("GET /script/%E4%B8%AD%E6%96%87.js HTTP/1.1");
+        let header = RequestHeader::new(string);
+        assert!(header.is_some());
+        let header = header.unwrap();
+        let path = header.get_path();
+        assert_eq!(path, "/script/中文.js");
     }
 }
