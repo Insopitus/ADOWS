@@ -6,8 +6,8 @@ ADOWS is a small program that you can drag-drop your static webpage file folder 
 
 ## Usage
 
-Drag a folder that contains a `index.html` file at its root onto the `ADOWS.exe` file in the release page.
-You can also put `ADOWS.exe` in the target folder and run it to host the folder it's in.
+Drag a folder that contains a `index.html` file at its root onto the `adows.exe` file in the release page.
+You can also put `adows.exe` in the target directory and run it to host the directory it's in.
 
 ## Limitations
 
