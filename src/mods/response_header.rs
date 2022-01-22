@@ -30,3 +30,15 @@ impl ResponseHeader {
         format!("{}\r\n{}\r\n",self.response_line,self.header_fields.to_string())
     }
 }
+
+
+#[cfg(test)]
+mod test {
+    use super::ResponseHeader;
+
+  #[test]
+  fn simple_200_response(){
+    let response_header = ResponseHeader::new(200);
+    assert_eq!(response_header.to_string(),"HTTP/1.1 200 OK");
+  }
+}
