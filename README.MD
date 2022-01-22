@@ -30,6 +30,8 @@ Features implemented:
 Todos:
 1. concurrency;
 2. error recovery;
-3. cache;
+3. caching;
 4. relative path (../);
-5. use more reference(lifetime), less clones.
+5. to use more reference(lifetime), less clones.
+6. 
+
