@@ -39,6 +39,6 @@ mod test {
   #[test]
   fn simple_200_response(){
     let response_header = ResponseHeader::new(200);
-    assert_eq!(response_header.to_string(),"HTTP/1.1 200 OK");
+    assert_eq!(response_header.to_string(),"HTTP/1.1 200 OK\r\n\r\n");
   }
 }
