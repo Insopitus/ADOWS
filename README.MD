@@ -28,7 +28,7 @@ Features implemented:
 5. URI decoding;
 
 Todos:
-5. concurrency
-6. error recovery
-7. cache
-8. relative path (../)
+5. concurrency;
+6. error recovery;
+7. cache;
+8. relative path (../);
