@@ -33,5 +33,4 @@ Todos:
 3. caching;
 4. relative path (../);
 5. to use more reference(lifetime), less clones.
-6. 
 
