@@ -14,9 +14,9 @@ pub fn percent_decode(string: &str) -> String {
                             match bytes.next() {
                                 Some(b) => {
                                     second = *b;
-                                    let first_int = ascii_to_hex(first);
+                                    let first_int = ascii_hex_str_byte_to_number(first);
 
-                                    let second_int = ascii_to_hex(second);
+                                    let second_int = ascii_hex_str_byte_to_number(second);
                                     if first_int.is_none() || second_int.is_none() {
                                         result.push(b'%');
                                         result.push(first);
@@ -53,7 +53,9 @@ pub fn percent_decode(string: &str) -> String {
 }
 
 /// convert a utf-8 byte to its hex value, e.g. b'A' -> 10
-pub fn ascii_to_hex(b: u8) -> Option<u8> {
+/// 
+/// returns Options::None if it's not a valid Hex string e.g. b'U'
+fn ascii_hex_str_byte_to_number(b: u8) -> Option<u8> {
     match b {
         b'0'..=b'9' => Some(b - b'0'),
         b'a'..=b'f' => Some(b - b'a' + 10),

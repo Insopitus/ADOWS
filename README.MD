@@ -33,4 +33,5 @@ Todos:
 3. caching;
 4. relative path (../);
 5. to use more reference(lifetime), less clones.
-
+6. memory usage: the program uses twice as much memory as the hosted file (sometimes)
+7. memory usage: maybe don't read the full file at once, (read part of it and send to tcp stream and repeat..)
