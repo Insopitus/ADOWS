@@ -2,15 +2,15 @@ pub mod mods;
 use std::{
     io::{self, BufRead, BufReader, Write},
     net::{TcpListener, TcpStream},
-    path::{self, Path},
+    path::Path,
 };
 
 use mods::{
-    folder_reader::{self, FolderReader},
+    folder_reader::FolderReader,
     media_type::MediaType,
     request_header::RequestHeader,
     response_header::ResponseHeader,
-    thread_pool::{self, ThreadPool},
+    thread_pool::ThreadPool,
 };
 
 

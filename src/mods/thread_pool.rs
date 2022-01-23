@@ -44,7 +44,6 @@ impl Worker {
     let handle = thread::spawn(move||{
       loop{
         let job = receiver.lock().unwrap().recv().unwrap(); //TODO error handling
-        println!("Worker {id} got a job; executing...");
         job();
       }
     });
