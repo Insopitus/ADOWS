@@ -2,7 +2,7 @@ pub mod mods;
 use std::{
     io::{self, BufRead, BufReader, Write},
     net::{TcpListener, TcpStream},
-    path::Path,
+    path::Path, sync::Arc,
 };
 
 use mods::{
@@ -12,6 +12,8 @@ use mods::{
     response_header::ResponseHeader,
     thread_pool::ThreadPool,
 };
+
+use crate::mods::folder_reader;
 
 
 
@@ -38,27 +40,31 @@ fn listen(port: usize, path: String) -> Result<(), io::Error> {
     let listener = TcpListener::bind(format!("127.0.0.1:{}", &port))?;
     let thread_pool = ThreadPool::new(5);
     println!("Server listening at http://localhost:{}", &port);
+
+    // auto start the browser
     std::process::Command::new("cmd.exe")
         .arg("/C")
         .arg("start")
         .arg(format!("http://localhost:{}", port))
         .spawn()
         .ok();
+
+
+    let media_type_map = Arc::new(MediaType::new());
+    let folder_reader = Arc::new(FolderReader::new(Path::new(&path)));
     for stream in listener.incoming() {
         let stream = stream?;
-        let path = path.clone();
+        let media_type_map = media_type_map.clone();
+        let folder_reader = folder_reader.clone();
         thread_pool.execute(move|| {
-            handle_connection(stream, path);
+            handle_connection(stream, folder_reader,media_type_map.clone());
         });
         // self.handle_connection(stream)?;
     }
     Ok(())
 }
 
-fn handle_connection(stream: TcpStream, path: String) -> Result<(), std::io::Error> {
-    let media_type_map = MediaType::new();
-    let path = Path::new(&path);
-    let folder_reader = FolderReader::new(path);
+fn handle_connection(stream: TcpStream, folder_reader: Arc<FolderReader>,media_type_map:Arc<MediaType>) -> Result<(), std::io::Error> {
     let mut reader = BufReader::new(stream.try_clone()?);
     let mut string = String::with_capacity(1024);
 
@@ -132,7 +138,6 @@ fn send_response(
     media_type: String,
     contents: &mut Vec<u8>,
 ) -> Result<(), std::io::Error> {
-    // TODO write a response header structure to orgnize the response
     let mut response_header = ResponseHeader::new(code);
     if media_type != "" {
         response_header.insert_field("Content-Type".to_string(), media_type.to_string());
