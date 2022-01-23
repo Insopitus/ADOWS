@@ -18,7 +18,7 @@ This project is inspired by the official rust book's "write a web server" part. 
 
 On the other hand, the project is written for learning and practising purpose mainly. I try not to use any third-party libraries/crates (reinvented many wheels).
 
-The program is full-functional now. All I'll do later is optimizing. The program is usable for the moment, but I dare not say it's production-ready.
+ADOWS is full-functional now. All I'll do later is optimizing. The program is usable for the moment, but I dare not say it's production-ready.
 
 Features implemented:
 1. TCP connection handling;
