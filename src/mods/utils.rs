@@ -1,4 +1,6 @@
 /// percent decoding for URIs
+/// 
+/// returns the original characters when meeting invalid percent encoding e.g. "%7s"->"%7s"
 pub fn percent_decode(string: &str) -> String {
     let mut bytes = string.as_bytes().into_iter();
     let mut result: Vec<u8> = Vec::with_capacity(bytes.len());

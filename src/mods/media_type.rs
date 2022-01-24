@@ -1,4 +1,4 @@
-use std::{collections::HashMap};
+use std::collections::HashMap;
 
 pub struct MediaType{
   map:HashMap<String,String>

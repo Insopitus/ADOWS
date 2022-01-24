@@ -25,7 +25,7 @@ pub fn run(mut port: usize, path: String) {
                 port += 1;
                 continue;
             } else {
-                println!("Server failed to start.");
+                println!("Server failed to start");
                 break;
             }
         } else {
@@ -143,6 +143,7 @@ fn send_response(
         response_header.insert_field("Content-Type".to_string(), media_type.to_string());
     }
     response_header.insert_field("Content-Length".to_string(), contents.len().to_string());
+    response_header.insert_field("Server".to_string(), "A.D.O.W.S.".to_string());
     let response_header = response_header.to_string();
     let mut response = Vec::with_capacity(response_header.len() + contents.len());
     response.append(&mut response_header.as_bytes().into());
