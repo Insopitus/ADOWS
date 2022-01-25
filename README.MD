@@ -5,7 +5,7 @@ ADOWS is a small program that you can drag-drop your static webpage file folder 
 
 ## Usage
 
-Drag a file folder that contains a `index.html` file right inside it onto the `adows.exe` file which you can get from the release page.
+Drag a file folder that contains a `index.html` file right inside it onto the `adows.exe` file which you can get from the [release page](https://github.com/Insopitus/ADOWS/releases).
 You can also put `adows.exe` in the target directory and run it to host the directory it's in.
 
 ## Limitations
@@ -31,9 +31,9 @@ Todos:
 1. concurrency;
 2. error recovery;
 3. caching;
-4. relative path (../);
 5. to use more reference(lifetime), less clones.
-6. memory usage: the program uses twice as much memory as the hosted file (sometimes)
-7. memory usage: maybe don't read the full file at once, (read part of it and send to tcp stream and repeat.. chuncking as they say.)
-8. logging requester ip, time, etc.
+6. memory usage: the program uses *exactly* twice as much memory as the hosted file (sometimes)
+7. memory usage: don't read the full file at once, (read part of it and write to tcp stream then repeat.. `chuncking` as they say.)
+8. logging requester's ip, time requested, etc.
 9. security: (DoS is already handled)
+10. HTTP/2.0 support, maybe?

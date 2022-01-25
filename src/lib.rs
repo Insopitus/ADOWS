@@ -13,7 +13,6 @@ use mods::{
     thread_pool::ThreadPool,
 };
 
-use crate::mods::folder_reader;
 
 
 
@@ -57,7 +56,7 @@ fn listen(port: usize, path: String) -> Result<(), io::Error> {
         let media_type_map = media_type_map.clone();
         let folder_reader = folder_reader.clone();
         thread_pool.execute(move|| {
-            handle_connection(stream, folder_reader,media_type_map.clone());
+            handle_connection(stream, folder_reader,media_type_map.clone()).ok();
         });
         // self.handle_connection(stream)?;
     }
@@ -97,7 +96,7 @@ fn handle_connection(stream: TcpStream, folder_reader: Arc<FolderReader>,media_t
             mime_type = String::new();
         }
         let mut contents: Vec<u8>;
-        match folder_reader.get_file_as_binary(path) {
+        match folder_reader.get_file_as_bytes(path) {
             Ok(bytes) => {
                 contents = bytes;
                 code = 200;

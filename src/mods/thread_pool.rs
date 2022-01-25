@@ -2,7 +2,7 @@ use std::{thread, sync::{mpsc, Arc, Mutex}};
 
 type Job = Box<dyn FnOnce() + Send + 'static>;
 pub struct ThreadPool {
-  workers:Vec<Worker>,
+  _workers:Vec<Worker>,
   sender:mpsc::Sender<Job>
 }
 impl ThreadPool {
@@ -22,7 +22,7 @@ impl ThreadPool {
         workers.push(Worker::new(id,Arc::clone(&receiver)));
       };
       ThreadPool{
-        workers,
+        _workers: workers,
         sender,
       }
     }
@@ -36,8 +36,8 @@ impl ThreadPool {
 }
 
 struct Worker{
-  id:usize,
-  handle:thread::JoinHandle<()>
+  _id:usize,
+  _handle:thread::JoinHandle<()>
 }
 impl Worker {
   fn new(id:usize,receiver:Arc<Mutex<mpsc::Receiver<Job>>>)->Self{
@@ -47,7 +47,7 @@ impl Worker {
         job();
       }
     });
-    Worker { id, handle }
+    Worker { _id: id, _handle: handle }
   }
 }
 
