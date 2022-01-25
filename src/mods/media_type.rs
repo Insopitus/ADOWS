@@ -1,28 +1,28 @@
 use std::collections::HashMap;
 
 pub struct MediaType{
-  map:HashMap<String,String>
+  map:HashMap<&'static str,&'static str>
 }
 impl MediaType {
     pub fn new()->Self{
       let mut map = HashMap::new();
       // basic front end
-      map.insert("html".to_string(), "text/html".to_string());
-      map.insert("css".to_string(), "text/css".to_string());
-      map.insert("js".to_string(), "text/javascript".to_string());
-      map.insert("json".to_string(), "application/json".to_string());
+      map.insert("html", "text/html");
+      map.insert("css", "text/css");
+      map.insert("js", "text/javascript");
+      map.insert("json", "application/json");
 
       // images
-      map.insert("jpg".to_string(), "image/jpeg".to_string());
-      map.insert("jpeg".to_string(), "image/jpeg".to_string());
-      map.insert("png".to_string(), "image/png".to_string());
-      map.insert("svg".to_string(), "image/svg+xml".to_string());
-      map.insert("gif".to_string(), "image/gif".to_string());
-      map.insert("webp".to_string(), "image/webp".to_string());
+      map.insert("jpg", "image/jpeg");
+      map.insert("jpeg", "image/jpeg");
+      map.insert("png", "image/png");
+      map.insert("svg", "image/svg+xml");
+      map.insert("gif", "image/gif");
+      map.insert("webp", "image/webp");
 
       // videos
-      map.insert("mp4".to_string(), "video/mp4".to_string());
-      map.insert("avi".to_string(), "video/avi".to_string());
+      map.insert("mp4", "video/mp4");
+      map.insert("avi", "video/avi");
 
 
 
@@ -33,7 +33,7 @@ impl MediaType {
       }
     }
 
-    pub fn get_mime_type(&self,suffix:&str)->Option<&String>{
-      self.map.get(suffix)
+    pub fn get_mime_type(&self,suffix:&str)->Option<&str>{
+      self.map.get(suffix).map(|s|*s)
     }
 }
