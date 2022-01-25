@@ -1,9 +1,18 @@
 use std::{path::Path, fs::{self, read_dir, File}, io::{self, BufReader, Read}};
 
+/// A class to reader file from the given path
+/// 
+/// it's instanized once and use by all the threads, be careful.
 pub struct FolderReader{
+  
     root_path:String,
+    
 }
 impl FolderReader{
+
+  /// `path`: the root path of the reader, all request path are relative to this path.
+  ///
+  /// `chunk_size`: how many bytes can be read at once (to limit memory usage)
     pub fn new(path:&Path) -> FolderReader{
         let metadata = fs::metadata(path).unwrap();
         let mut root_path;
@@ -45,6 +54,7 @@ impl FolderReader{
         let file_path = self.get_full_path_from_relative(dir);
         let mut reader = BufReader::new(File::open(file_path)?);
         let mut buf = vec![0u8;chunk_size];
+        
         reader.read_exact(&mut buf)?;
         Ok(buf)
     }
