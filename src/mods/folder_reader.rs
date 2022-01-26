@@ -1,9 +1,19 @@
 use std::{path::Path, fs::{self, read_dir, File}, io::{self, Read}};
 const CHUNK_SIZE:usize = 65536;  // 64kb
+
+/// A class to reader file from the given path
+/// 
+/// it's instanized once and use by all the threads, be careful.
 pub struct FolderReader{
+  
     root_path:String,
+    
 }
 impl FolderReader{
+
+  /// `path`: the root path of the reader, all request path are relative to this path.
+  ///
+  /// `chunk_size`: how many bytes can be read at once (to limit memory usage)
     pub fn new(path:&Path) -> FolderReader{
         let metadata = fs::metadata(path).unwrap();
         let mut root_path;

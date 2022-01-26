@@ -11,7 +11,7 @@ use mods::{
     folder_reader::FolderReader, media_type::MediaType, request_header::RequestHeader,
     response_header::ResponseHeader, thread_pool::ThreadPool,
 };
-
+const THREAD_POOL_SIZE: usize = 5;
 pub fn run(mut port: usize, path: String) {
     loop {
         let start = listen(port, path.clone());
@@ -33,7 +33,7 @@ pub fn run(mut port: usize, path: String) {
 
 fn listen(port: usize, path: String) -> Result<(), io::Error> {
     let listener = TcpListener::bind(format!("127.0.0.1:{}", &port))?;
-    let thread_pool = ThreadPool::new(5);
+    let thread_pool = ThreadPool::new(THREAD_POOL_SIZE);
     println!("Server listening at http://localhost:{}", &port);
 
     // auto start the browser
@@ -45,7 +45,9 @@ fn listen(port: usize, path: String) -> Result<(), io::Error> {
         .ok();
 
     let media_type_map = Arc::new(MediaType::new());
-    let folder_reader = Arc::new(FolderReader::new(Path::new(&path)));
+    let folder_reader = Arc::new(FolderReader::new(
+        Path::new(&path),
+    ));
     for stream in listener.incoming() {
         let mut stream = stream?;
         let media_type_map = media_type_map.clone();
