@@ -1,5 +1,5 @@
-use std::{path::Path, fs::{self, read_dir, File}, io::{self, BufReader, Read}};
-
+use std::{path::Path, fs::{self, read_dir, File}, io::{self, Read}};
+const CHUNK_SIZE:usize = 65536;  // 64kb
 pub struct FolderReader{
     root_path:String,
 }
@@ -33,6 +33,10 @@ impl FolderReader{
         
         file_path
     }
+    pub fn get_file_size(&self,dir:&str)->Result<u64,io::Error>{
+        let file_path = self.get_full_path_from_relative(dir);
+        Ok(fs::metadata(file_path)?.len())
+    }
     pub fn get_file_as_string(&self,dir:&str)->Result<String,io::Error>{
         let file_path = self.get_full_path_from_relative(dir);
         fs::read_to_string(file_path)
@@ -41,12 +45,11 @@ impl FolderReader{
         let file_path = self.get_full_path_from_relative(dir);
         fs::read(file_path)
     }
-    pub fn get_chunked_file_as_bytes(&self,dir:&str,chunk_size:usize)->Result<Vec<u8>,io::Error>{
+    pub fn get_chunked_file_as_bytes(&self,dir:&str)->Result<FileChunks,io::Error>{
         let file_path = self.get_full_path_from_relative(dir);
-        let mut reader = BufReader::new(File::open(file_path)?);
-        let mut buf = vec![0u8;chunk_size];
-        reader.read_exact(&mut buf)?;
-        Ok(buf)
+        let file = File::open(file_path)?;
+        let chunks = FileChunks{file,content:[0u8;CHUNK_SIZE]};
+        Ok(chunks)        
     }
     /// recursively enumerate all the files in the path
     fn _visit_dir(&self,path: &Path, info: &mut String) -> Result<(), std::io::Error> {
@@ -61,5 +64,20 @@ impl FolderReader{
             }
         }
         Ok(())
+    }
+}
+
+pub struct FileChunks{
+    file:File,
+    content:[u8;CHUNK_SIZE]
+}
+impl Iterator for FileChunks{
+    type Item = [u8;CHUNK_SIZE];
+    fn next(&mut self) -> Option<Self::Item> {
+        match self.file.read_exact(&mut self.content) {
+            Ok(_)=>Some(self.content),
+            Err(_)=>None,
+        }
+        
     }
 }

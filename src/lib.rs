@@ -1,4 +1,5 @@
 pub mod mods;
+pub mod error;
 use std::{
     io::{self, BufRead, BufReader, Write},
     net::{TcpListener, TcpStream},
@@ -46,13 +47,14 @@ fn listen(port: usize, path: String) -> Result<(), io::Error> {
     let media_type_map = Arc::new(MediaType::new());
     let folder_reader = Arc::new(FolderReader::new(Path::new(&path)));
     for stream in listener.incoming() {
-        let stream = stream?;
+        let mut stream = stream?;
         let media_type_map = media_type_map.clone();
         let folder_reader = folder_reader.clone();
         thread_pool.execute(move || {
-            let (code, media_type, mut contents) =
+            let (code, media_type,content_length) =
                 handle_connection(&stream, folder_reader, media_type_map.clone());
-            send_response(stream, code, &media_type, &mut contents).ok();
+            send_response_headers(&mut stream, code, &media_type,content_length);
+            send_response_body();
         });
         // self.handle_connection(stream)?;
     }
@@ -63,7 +65,7 @@ fn handle_connection(
     stream: &TcpStream,
     folder_reader: Arc<FolderReader>,
     media_type_map: Arc<MediaType>,
-) -> (u32, String, Vec<u8>) {
+) -> (u32, String,usize) {
     let mut reader = BufReader::new(stream);
     let mut string = String::with_capacity(1024);
 
@@ -74,7 +76,7 @@ fn handle_connection(
             break; //break at the end of the header (an empty line with only b'\r\n')
         }
     }
-
+    
     let header = RequestHeader::new(string);
     if let Some(header) = header {
         let code;
@@ -91,50 +93,45 @@ fn handle_connection(
         } else {
             mime_type = "";
         }
-        let contents: Vec<u8>;
-        match folder_reader.get_file_as_bytes(path) {
-            Ok(bytes) => {
-                contents = bytes;
+        let mut content_length:usize = 0;
+        match folder_reader.get_file_size(path) {
+            Ok(length) => {
                 code = 200;
+                content_length = length.try_into().unwrap_or(0);
             }
             Err(err) => match err.kind() {
                 io::ErrorKind::NotFound => {
-                    contents = "Not Found".into();
                     code = 404;
                 }
                 io::ErrorKind::PermissionDenied => {
-                    contents = "Forbiden".into();
                     code = 403;
                 }
                 _ => {
-                    contents = "Forbiden".into();
                     code = 403;
                 }
             },
         }
         println!("Request: {} - {}", path, code);
-        (code, mime_type.to_owned(), contents)
+        (code, mime_type.to_owned(),content_length)
     } else {
-        (400, "".to_owned(), "Bad Request".into())
+        (400, "".to_owned(),0)
     }
 }
-fn send_response(
-    mut stream: TcpStream,
-    code: u32,
-    media_type: &str,
-    contents: &mut Vec<u8>,
-) -> Result<(), std::io::Error> {
+fn send_response_headers(stream:&mut TcpStream,code:u32,mime_type:&str,content_length:usize)-> Result<(), std::io::Error>{
     let mut response_header = ResponseHeader::new(code);
-    if media_type != "" {
-        response_header.insert_field("Content-Type".to_string(), media_type.to_string());
+    if mime_type != "" {
+        response_header.insert_field("Content-Type".to_string(), mime_type.to_string());
     }
-    response_header.insert_field("Content-Length".to_string(), contents.len().to_string());
+    response_header.insert_field("Content-Length".to_string(), content_length.to_string());
     response_header.insert_field("Server".to_string(), "A.D.O.W.S.".to_string());
     let response_header = response_header.to_string();
-    let mut response = Vec::with_capacity(response_header.len() + contents.len());
+    let mut response = Vec::with_capacity(response_header.len() + content_length);
     response.append(&mut response_header.as_bytes().into());
-    response.append(contents);
     stream.write_all(&response)?;
     stream.flush()?;
     Ok(())
 }
+fn send_response_body(){
+
+}
+
