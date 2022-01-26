@@ -26,14 +26,16 @@ Features implemented:
 3. file reading;
 4. MIME type support for main media types;
 5. URI decoding;
+6. file read stream chunking
+7. concurency
 
 Todos:
-1. concurrency;
+1. ~~concurrency;~~
 2. error recovery;
 3. caching;
 5. to use more reference(lifetime), less clones.
 6. memory usage: the program uses *exactly* twice as much memory as the hosted file (sometimes)
-7. memory usage: don't read the full file at once, (read part of it and write to tcp stream then repeat.. `chuncking` as they say.)
+7. ~~memory usage: don't read the full file at once, (read part of it and write to tcp stream then repeat.. `chuncking` as they say.)~~ read chunking data to heap memory (since stack memory is limited)
 8. logging requester's ip, time requested, etc.
 9. security: (DoS is already handled)
 10. HTTP/2.0 support, maybe?

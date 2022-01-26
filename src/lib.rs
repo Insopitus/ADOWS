@@ -1,5 +1,5 @@
-pub mod mods;
 pub mod error;
+pub mod mods;
 use std::{
     io::{self, BufRead, BufReader, Write},
     net::{TcpListener, TcpStream},
@@ -45,18 +45,13 @@ fn listen(port: usize, path: String) -> Result<(), io::Error> {
         .ok();
 
     let media_type_map = Arc::new(MediaType::new());
-    let folder_reader = Arc::new(FolderReader::new(
-        Path::new(&path),
-    ));
+    let folder_reader = Arc::new(FolderReader::new(Path::new(&path)));
     for stream in listener.incoming() {
         let mut stream = stream?;
         let media_type_map = media_type_map.clone();
         let folder_reader = folder_reader.clone();
         thread_pool.execute(move || {
-            let (code, media_type,content_length) =
-                handle_connection(&stream, folder_reader, media_type_map.clone());
-            send_response_headers(&mut stream, code, &media_type,content_length);
-            send_response_body();
+            handle_connection(stream, folder_reader, media_type_map.clone());
         });
         // self.handle_connection(stream)?;
     }
@@ -64,11 +59,11 @@ fn listen(port: usize, path: String) -> Result<(), io::Error> {
 }
 
 fn handle_connection(
-    stream: &TcpStream,
+    mut stream: TcpStream,
     folder_reader: Arc<FolderReader>,
     media_type_map: Arc<MediaType>,
-) -> (u32, String,usize) {
-    let mut reader = BufReader::new(stream);
+) -> Result<(),io::Error> {
+    let mut reader = BufReader::new(&mut stream);
     let mut string = String::with_capacity(1024);
 
     loop {
@@ -78,13 +73,13 @@ fn handle_connection(
             break; //break at the end of the header (an empty line with only b'\r\n')
         }
     }
-    
+
     let header = RequestHeader::new(string);
-    if let Some(header) = header {
+    let (code, mime_type, content_length, path) = if let Some(header) = header {
         let code;
-        let path = header.get_path();
+        let path = header.get_path().to_owned();
         let path = if path == "/" {
-            "index.html" // redirect if path is empty
+            "index.html".to_owned() // redirect if path is empty
         } else {
             path
         };
@@ -95,8 +90,8 @@ fn handle_connection(
         } else {
             mime_type = "";
         }
-        let mut content_length:usize = 0;
-        match folder_reader.get_file_size(path) {
+        let mut content_length: usize = 0;
+        match folder_reader.get_file_size(&path) {
             Ok(length) => {
                 code = 200;
                 content_length = length.try_into().unwrap_or(0);
@@ -114,12 +109,13 @@ fn handle_connection(
             },
         }
         println!("Request: {} - {}", path, code);
-        (code, mime_type.to_owned(),content_length)
+        (code, mime_type.to_owned(), content_length, Some(path))
     } else {
-        (400, "".to_owned(),0)
-    }
-}
-fn send_response_headers(stream:&mut TcpStream,code:u32,mime_type:&str,content_length:usize)-> Result<(), std::io::Error>{
+        (400, "".to_owned(), 0, None)
+    };
+
+
+    // send response headers
     let mut response_header = ResponseHeader::new(code);
     if mime_type != "" {
         response_header.insert_field("Content-Type".to_string(), mime_type.to_string());
@@ -131,9 +127,14 @@ fn send_response_headers(stream:&mut TcpStream,code:u32,mime_type:&str,content_l
     response.append(&mut response_header.as_bytes().into());
     stream.write_all(&response)?;
     stream.flush()?;
+    // send response body
+    if let Some(path) = path{
+      for bytes in folder_reader.get_chunked_file_as_bytes(&path)?{
+        stream.write_all(&bytes)?;
+        stream.flush()?;
+      }
+    }
     Ok(())
 }
-fn send_response_body(){
 
-}
 
