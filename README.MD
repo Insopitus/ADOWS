@@ -14,11 +14,11 @@ You can also put `adows.exe` in the target directory and run it to host the dire
 
 ## Description
 
-This project is inspired by the official rust book's "write a web server" part. The original one is very rough, unstable and lacks a lot of features. So I tried to add more funtionality and make it robust. 
+This project is based on the official rust book's "build a web server" chapter. The original one is very rough, unstable and lacks a lot of features. My goal is to add more funtionality to it and make it robust. 
 
-On the other hand, the project is written for learning and practising purpose mainly. I try not to use any third-party libraries/crates (reinvented many wheels).
+On the other hand, the project is written for learning and practising purpose mainly. I will avoid using third-party libraries/crates. As a result, ADOWS may not be production-ready at any moment. But it's enough for general use case.
 
-ADOWS is full-functional now. All I'll do later is optimizing. The program is usable for the moment, but I dare not say it's production-ready.
+Right now, ADOWS is ready to use. It's fast, stable, memory safe and uses little RAM (a few megabytes).
 
 Features implemented:
 1. TCP connection handling;
