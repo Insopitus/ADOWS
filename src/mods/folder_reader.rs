@@ -1,9 +1,9 @@
 use std::{
     fs::{self, read_dir, File},
-    io::{self, BufRead, BufReader, Read},
+    io::{self, BufReader, Read},
     path::Path,
 };
-const CHUNK_SIZE: usize = 1024*128; // 64kb
+const CHUNK_SIZE: usize = 1024*64; // 64kb
 
 /// A class to reader file from the given path
 ///
@@ -16,13 +16,13 @@ impl FolderReader {
     ///
     /// `chunk_size`: how many bytes can be read at once (to limit memory usage)
     pub fn new(path: &Path) -> FolderReader {
-        let metadata = fs::metadata(path).unwrap();
+        let metadata = fs::metadata(path).expect("Failed to read the directory"); //should throw an error showing `failed to read the directory`
         let mut root_path;
+        let path = path.to_str().expect("Invalid path."); //should throw an error showing `invalid path`
         if metadata.is_dir() {
-            root_path = path.to_str().unwrap().to_string();
+            root_path = path.to_string();
         } else {
-            let str = path.to_str().unwrap(); // TODO error handling
-            let mut a = str.split("\\").collect::<Vec<&str>>();
+            let mut a = path.split("\\").collect::<Vec<&str>>();
             a.pop();
 
             root_path = a.join("\\");

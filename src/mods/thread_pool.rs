@@ -26,12 +26,13 @@ impl ThreadPool {
         sender,
       }
     }
-    pub fn execute<F>(&self, f: F)
+    pub fn execute<F>(&self, f: F)->Result<(),mpsc::SendError<Box<dyn FnOnce()+Send>>>
     where
         F: FnOnce() + Send + 'static,
     {
       let job = Box::new(f);
-      self.sender.send(job).unwrap(); // TODO error handling
+      self.sender.send(job)?; // TODO error handling
+      Ok(())
     }
 }
 
@@ -43,8 +44,13 @@ impl Worker {
   fn new(id:usize,receiver:Arc<Mutex<mpsc::Receiver<Job>>>)->Self{
     let handle = thread::spawn(move||{
       loop{
-        let job = receiver.lock().unwrap().recv().unwrap(); //TODO error handling
-        job();
+        let res = receiver.lock();
+        if let Ok(guard) = res {
+          let res = guard.recv();
+          if let Ok(job) = res {
+            job();
+          }
+        }
       }
     });
     Worker { _id: id, _handle: handle }

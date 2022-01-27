@@ -8,10 +8,6 @@ ADOWS is a small program that you can drag-drop your static webpage file folder 
 Drag a file folder that contains a `index.html` file right inside it onto the `adows.exe` file which you can get from the [release page](https://github.com/Insopitus/ADOWS/releases).
 You can also put `adows.exe` in the target directory and run it to host the directory it's in.
 
-## Limitations
-
-1. The server is single-threaded right now. If it's used to host large files, the process would be slow.
-
 ## Description
 
 This project is based on the official rust book's "build a web server" chapter. The original one is very rough, unstable and lacks a lot of features. My goal is to add more funtionality to it and make it robust. 
@@ -33,9 +29,10 @@ Todos:
 1. ~~concurrency;~~
 2. error recovery;
 3. caching;
+4. more http header supporting;
 5. to use more reference(lifetime), less clones.
-6. memory usage: the program uses *exactly* twice as much memory as the hosted file (sometimes)
 7. ~~memory usage: don't read the full file at once, (read part of it and write to tcp stream then repeat.. `chuncking` as they say.)~~ read chunking data to heap memory (since stack memory is limited)
 8. logging requester's ip, time requested, etc.
 9. security: (DoS is already handled)
 10. HTTP/2.0 support, maybe?
+11. gzip: may need external crates.

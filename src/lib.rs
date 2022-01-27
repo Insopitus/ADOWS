@@ -28,7 +28,7 @@ pub fn run(mut port: usize, path: String) {
         }
     }
     println!("Press Enter to continue.");
-    std::io::stdin().read_line(&mut String::new()).unwrap();
+    std::io::stdin().read_line(&mut String::new()).unwrap_or(0);
 }
 
 fn listen(port: usize, path: String) -> Result<(), io::Error> {
@@ -47,13 +47,16 @@ fn listen(port: usize, path: String) -> Result<(), io::Error> {
     let media_type_map = Arc::new(MediaType::new());
     let folder_reader = Arc::new(FolderReader::new(Path::new(&path)));
     for stream in listener.incoming() {
-        let mut stream = stream?;
+        let stream = stream?;
         let media_type_map = media_type_map.clone();
         let folder_reader = folder_reader.clone();
-        thread_pool.execute(move || {
-            handle_connection(stream, folder_reader, media_type_map.clone());
-        });
-        // self.handle_connection(stream)?;
+        thread_pool
+            .execute(move || {
+                handle_connection(stream, folder_reader, media_type_map.clone()).ok();
+                // TODO may need handling
+            })
+            .ok(); // TODO may need handling
+                   // self.handle_connection(stream)?;
     }
     Ok(())
 }
@@ -62,7 +65,7 @@ fn handle_connection(
     mut stream: TcpStream,
     folder_reader: Arc<FolderReader>,
     media_type_map: Arc<MediaType>,
-) -> Result<(),io::Error> {
+) -> Result<(), io::Error> {
     let mut reader = BufReader::new(&mut stream);
     let mut string = String::with_capacity(1024);
 
@@ -114,7 +117,6 @@ fn handle_connection(
         (400, "".to_owned(), 0, None)
     };
 
-
     // send response headers
     let mut response_header = ResponseHeader::new(code);
     if mime_type != "" {
@@ -128,13 +130,11 @@ fn handle_connection(
     stream.write_all(&response)?;
     stream.flush()?;
     // send response body
-    if let Some(path) = path{
-      for bytes in folder_reader.get_chunked_file_as_bytes(&path)?{
-        stream.write_all(&bytes)?;
-        stream.flush()?;
-      }
+    if let Some(path) = path {
+        for bytes in folder_reader.get_chunked_file_as_bytes(&path)? {
+            stream.write_all(&bytes)?;
+            stream.flush()?;
+        }
     }
     Ok(())
 }
-
-
