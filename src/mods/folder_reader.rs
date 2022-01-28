@@ -22,7 +22,7 @@ impl FolderReader {
         if metadata.is_dir() {
             root_path = path.to_string();
         } else {
-            let mut a = path.split("\\").collect::<Vec<&str>>();
+            let mut a:Vec<&str> = path.split("\\").collect();
             a.pop();
 
             root_path = a.join("\\");
