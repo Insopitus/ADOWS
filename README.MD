@@ -10,7 +10,7 @@ ADOWS is a small program that you can drag-drop your static webpage file folder 
 
 3. The server starts at `http://localhost:8080/` by default, if the port `8080` is in use, ADOWS will try to use `8081`, `8082`, until it finds an available port.
 
-*ADOWS should work on linux and macOS but I didn't test it. You also need to build the executable youself.*
+*ADOWS should work on linux and macOS but I didn't test it. You also need to build the executable youself in that case.*
 
 ## Description
 
