@@ -22,19 +22,19 @@ For now, ADOWS has meet the goal for general usage. It's fast, stable, memory sa
 
 Features implemented:
 1. TCP connection handling;
-2. HTTP header parsing;
-4. MIME type support for common media types;
-5. URI decoding;
-6. file chunk reading;
-7. concurency;
+1. HTTP header parsing;
+1. MIME type support for common media types;
+1. URI decoding;
+1. file chunk reading;
+1. concurency;
 
 Todos:
 1. implement keep-alive header to boost performance
-2. error recovery;
-3. caching;
-4. more http header supports;
-5. to use more reference(lifetime), less clones.
-8. logging requester's ip, time requested, etc.
-9. security: (DoS is already handled)
-10. HTTP/2.0 support, maybe?
-11. gzip: may need external crates.
+1. error recovery;
+1. caching;
+1. more http header supports;
+1. to use more reference(lifetime), less clones.
+1. logging requester's ip, time requested, etc.
+1. security: (DoS is already handled)
+1. HTTP/2.0 support, maybe?
+1. gzip: may need external crates.
