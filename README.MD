@@ -8,7 +8,7 @@ ADOWS is a small program that you can drag-drop your static webpage file folder 
 
 2. Drag and drop a folder to `adows.exe`, the server will then start hosting the target directory. You can also put `adows.exe` in the target directory and run it there. Further more, since ADOWS is a CLI program you can also use the command line: `adows.exe your/target/directory`.
 
-3. The server starts at `http://localhost:8080/` by default, if the port `8080` is in use, ADOWS will try to use `8081`, `8082`, until it finds a usable port.
+3. The server starts at `http://localhost:8080/` by default, if the port `8080` is in use, ADOWS will try to use `8081`, `8082`, until it finds an available port.
 
 *ADOWS should work on linux and macOS but I didn't test it. You also need to build the executable youself.*
 
