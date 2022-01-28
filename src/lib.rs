@@ -52,10 +52,10 @@ fn listen(port: usize, path: String) -> Result<(), io::Error> {
         let folder_reader = folder_reader.clone();
         thread_pool
             .execute(move || {
-                handle_connection(stream, folder_reader, media_type_map.clone()).ok();
+                handle_connection(stream, folder_reader, media_type_map.clone()).unwrap();
                 // TODO may need handling
             })
-            .ok(); // TODO may need handling
+            .unwrap(); // TODO may need handling
                    // self.handle_connection(stream)?;
     }
     Ok(())

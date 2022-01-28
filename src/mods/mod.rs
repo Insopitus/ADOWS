@@ -6,4 +6,6 @@ pub mod response_header;
 pub mod header_fields;
 pub mod thread_pool;
 pub mod uri;
+pub mod server;
+pub mod file_reader;
 

@@ -26,7 +26,7 @@ Features implemented:
 7. concurency
 
 Todos:
-1. ~~concurrency;~~
+1. implement keep-alive header to boost performance
 2. error recovery;
 3. caching;
 4. more http header supporting;
