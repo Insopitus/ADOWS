@@ -13,12 +13,14 @@ pub struct FileReader {
 
 impl FileReader {
     pub fn new(root_path: &str, path: &str) -> Result<Self, io::Error> {
-        let path = Path::new(root_path).join(path);
+        let path = Path::new(&root_path.to_string()).join(path);
+        dbg!(&root_path);
+        dbg!(&path);
         let file = File::open(&path)?;
         let reader = BufReader::new(file);
         Ok(FileReader { path, reader })
     }
-    pub fn get_file_size(&self) -> Result<u64, io::Error> {
+    pub fn get_size(&self) -> Result<u64, io::Error> {
         Ok(fs::metadata(&self.path)?.len())
     }
     pub fn read_as_string(&self) -> Result<String, io::Error> {

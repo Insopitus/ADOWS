@@ -25,7 +25,11 @@ impl From<io::Error> for Error {
         let new_kind = match e.kind() {
             io::ErrorKind::NotFound=> ErrorKind::FileNotFound,
             io::ErrorKind::OutOfMemory=>ErrorKind::OutOfMemory,
-            _=>ErrorKind::InternalServerError,
+            io::ErrorKind::AddrInUse=>ErrorKind::AddrInUse,
+            _=>{
+                dbg!(&e);
+                ErrorKind::InternalServerError
+            },
         };
         Error { kind: new_kind } // TODO placeholder
     }
@@ -43,10 +47,11 @@ impl Error{
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug,PartialEq)]
 pub enum ErrorKind {
     BadRequest,
     InternalServerError,
     FileNotFound,
     OutOfMemory,
+    AddrInUse,
 }
