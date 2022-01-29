@@ -16,16 +16,16 @@ ADOWS is a small program that you can drag-drop your static webpage file folder 
 
 This project is based on the official rust book's "build a web server" chapter. The original one is very rough, unstable and lacks a lot of features. My goal is to add more funtionality to it and make it robust. 
 
-On the other hand, the project is written for learning and practising purpose. I avoid using third-party libraries/crates. As a result, ADOWS may not be production-ready at any moment, but it should be enough for general use case.
+On the other hand, the project is written for learning and practising purpose. I avoid using third-party libraries/crates to get a better understanding of how things work. As a result, ADOWS may not be production-ready at any moment, but it should be enough for general use case.
 
-For now, ADOWS has meet the goal for general usage. It's fast, stable, memory safe and uses little RAM (a few megabytes).
+For now, ADOWS has meet its goal for common usage. It's fast, stable, memory safe and uses little RAM (a few megabytes).
 
-Features implemented:
+Features:
 1. TCP connection handling;
-1. HTTP header parsing;
+1. HTTP header parsing: not fully featured, just enough for a webpage host server;
 1. MIME type support for common media types;
-1. URI decoding;
-1. file chunk reading;
+1. URI decoding to support non-ASCII directory/file names;
+1. file chunk reading so the server won't use too many RAM while hosting large files;
 1. concurency;
 
 Todos:
