@@ -35,6 +35,6 @@ Todos:
 1. more http header supports;
 1. to use more reference(lifetime), less clones.
 1. logging requester's ip, time requested, etc.
-1. security: (DoS is already handled)
+1. security: don't know if it's nessassary.
 1. HTTP/2.0 support, maybe?
 1. gzip: may need external crates.
