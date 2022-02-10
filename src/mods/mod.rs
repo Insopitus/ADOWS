@@ -8,4 +8,5 @@ pub mod thread_pool;
 pub mod uri;
 pub mod server;
 pub mod file_reader;
+pub mod cache;
 

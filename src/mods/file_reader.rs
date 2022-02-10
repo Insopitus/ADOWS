@@ -13,9 +13,13 @@ pub struct FileReader {
 
 impl FileReader {
     pub fn new(root_path: &str, path: &str) -> Result<Self, io::Error> {
-        let path = Path::new(&root_path.to_string()).join(path);
-        dbg!(&root_path);
-        dbg!(&path);
+        let root_path = Path::new(root_path);
+        let mut sub_path = Path::new(path);
+        sub_path = sub_path.strip_prefix("/").unwrap_or(sub_path);
+        sub_path = sub_path.strip_prefix("./").unwrap_or(sub_path);
+        
+        let path = root_path.join(sub_path);
+        
         let file = File::open(&path)?;
         let reader = BufReader::new(file);
         Ok(FileReader { path, reader })

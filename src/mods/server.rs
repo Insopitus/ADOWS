@@ -25,10 +25,9 @@ pub struct Server {
 impl Server {
     pub fn start(root_path: &str, port: u32) -> Result<Self, crate::error::Error> {
         let addr = format!("127.0.0.1:{}", port);
-        dbg!(&addr);
         let listener = net::TcpListener::bind(addr)?;
+        println!("Server listening at http://localhost:{}",port);
         let media_type_map: Arc<MediaType> = Arc::new(MediaType::new());
-        println!("here");
         let server = Server {
             listener,
             root_path: root_path.to_string(),
@@ -41,7 +40,7 @@ impl Server {
         Ok(server)
     }
     fn init(server: &Server) -> Result<(), crate::error::Error> {
-        Server::open_browser(server.port);
+        // Server::open_browser(server.port);
 
         let thread_pool = ThreadPool::new(THREAD_POOL_SIZE);
 
@@ -53,9 +52,7 @@ impl Server {
                 .execute(move || {
                     Server::handle_request(stream, media_type_map, root_path).unwrap();
                     // TODO may need handling
-                })
-                .unwrap(); // TODO may need handling
-                           // self.handle_connection(stream)?;
+                }).unwrap();
         }
         Ok(())
     }
@@ -93,6 +90,7 @@ impl Server {
             } else {
                 path
             };
+            print!("Request: {}", path);
             let mime_type;
             let suffix = path.split(".").last();
             if let Some(suffix) = suffix {
@@ -101,26 +99,30 @@ impl Server {
                 mime_type = "";
             }
             let mut content_length: usize = 0;
-            let file_reader = FileReader::new(&root_path, &path)?;
-            match file_reader.get_size() {
-                Ok(length) => {
-                    code = 200;
-                    content_length = length.try_into().unwrap_or(0);
+            match FileReader::new(&root_path, &path) {
+                Ok(file_reader) => {
+                    match file_reader.get_size() {
+                        Ok(length) => {
+                            code = 200;
+                            content_length = length.try_into().unwrap_or(0);
+                        }
+                        Err(err) => match err.kind() {
+                            io::ErrorKind::NotFound => {
+                                code = 404;
+                            }
+                            io::ErrorKind::PermissionDenied => {
+                                code = 403;
+                            }
+                            _ => {
+                                code = 404;
+                            }
+                        },
+                    }
+                    println!(" - {}", code);
+                    (code, mime_type.to_owned(), content_length, Some(path))
                 }
-                Err(err) => match err.kind() {
-                    io::ErrorKind::NotFound => {
-                        code = 404;
-                    }
-                    io::ErrorKind::PermissionDenied => {
-                        code = 403;
-                    }
-                    _ => {
-                        code = 403;
-                    }
-                },
+                Err(_) => (404, "".to_owned(), 0, None),
             }
-            println!("Request: {} - {}", path, code);
-            (code, mime_type.to_owned(), content_length, Some(path))
         } else {
             (400, "".to_owned(), 0, None)
         };
@@ -132,17 +134,18 @@ impl Server {
         }
         response_header.insert_field("Content-Length".to_string(), content_length.to_string());
         response_header.insert_field("Server".to_string(), "A.D.O.W.S.".to_string());
+        // response_header.insert_field("Connection".to_string(), "keep-alive".to_string());
         let response_header = response_header.to_string();
         let mut response = Vec::with_capacity(response_header.len() + content_length);
         response.append(&mut response_header.as_bytes().into());
-        stream.write_all(&response)?;
+        stream.write(&response)?;
         stream.flush()?;
         // send response body
         if let Some(path) = path {
             let mut file_reader = FileReader::new(&root_path, &path)?;
 
             for bytes in file_reader.read_chunked_as_bytes()? {
-                stream.write_all(&bytes)?;
+                stream.write(&bytes)?;
                 stream.flush()?;
             }
         }
