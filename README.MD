@@ -27,11 +27,11 @@ For now, ADOWS has meet its goal for common usage. It's fast, stable, memory saf
 1. URI decoding to support non-ASCII directory/file names;
 1. file chunk reading so the server won't use too many RAM while hosting large files;
 1. concurency;
+1. caching;
 
 **Todos:**
 1. implement keep-alive header to boost performance
 1. error recovery;
-1. caching;
 1. more http header supports;
 1. to use more reference(lifetime), less clones.
 1. logging requester's ip, time requested, etc.
