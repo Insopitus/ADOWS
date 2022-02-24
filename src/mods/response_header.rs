@@ -10,6 +10,7 @@ impl ResponseHeader {
         response_line.push_str(" ");
         let code_desc = match code {
             200 => "OK",
+            304 => "NOT MODIFIED",
             400 => "BAD REQUEST",
             404 => "NOT FOUND",
             _ => "BAD REQUEST",

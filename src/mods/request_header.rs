@@ -60,6 +60,13 @@ impl RequestHeader {
             .parse::<usize>()
             .unwrap_or(0) // TODO maybe shouldn't return 0 if parse failed
     }
+    pub fn get_entity_tag(&self)->Option<String>{
+        
+        match self.header_fields.get("If-None-Match") {
+            Some(s)=>Some(s.trim().to_string()),
+            None=>None
+        }
+    }
     fn parse_request_line(line_one: &str) -> (String, String, String) {
         let mut line_one_iter = line_one.split(" ");
         let method = line_one_iter.next().unwrap_or("").to_string();

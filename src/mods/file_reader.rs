@@ -1,7 +1,7 @@
 use std::{
     fs::{self, File},
     io::{self, BufReader, Read},
-    path::{Path, PathBuf},
+    path::{Path, PathBuf}, time::SystemTime, hash::{Hash, Hasher},
 };
 
 const CHUNK_SIZE: usize = 1024*64; // 64kb
@@ -13,12 +13,18 @@ pub struct FileReader {
 
 impl FileReader {
     pub fn new(root_path: &str, path: &str) -> Result<Self, io::Error> {
-        let path = Path::new(root_path).join(path);
+        let root_path = Path::new(root_path);
+        let mut sub_path = Path::new(path);
+        sub_path = sub_path.strip_prefix("/").unwrap_or(sub_path);
+        sub_path = sub_path.strip_prefix("./").unwrap_or(sub_path);
+        
+        let path = root_path.join(sub_path);
+        
         let file = File::open(&path)?;
         let reader = BufReader::new(file);
         Ok(FileReader { path, reader })
     }
-    pub fn get_file_size(&self) -> Result<u64, io::Error> {
+    pub fn get_size(&self) -> Result<u64, io::Error> {
         Ok(fs::metadata(&self.path)?.len())
     }
     pub fn read_as_string(&self) -> Result<String, io::Error> {
@@ -35,6 +41,23 @@ impl FileReader {
             bytes_remaining: length.try_into().unwrap_or(0),
         };
         Ok(chunks)
+    }
+    fn get_last_modified_time(&self)->Result<SystemTime,io::Error>{
+        let metadata = fs::metadata(&self.path)?;
+        metadata.modified()
+    }
+    /// for HTML ETag header. based on the last modified time for the moment
+    pub fn get_entity_tag(&self)->String{
+        let mut hasher = std::collections::hash_map::DefaultHasher::new();
+        match self.get_last_modified_time() {
+            Ok(time)=>{
+                time.hash(&mut hasher);
+                format!("{:x}",hasher.finish())
+            },
+            Err(_)=>{
+                "unknown-time".to_string()
+            }
+        }
     }
 }
 
