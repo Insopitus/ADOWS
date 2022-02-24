@@ -43,7 +43,6 @@ impl Server {
         // Server::open_browser(server.port);
 
         let thread_pool = ThreadPool::new(THREAD_POOL_SIZE);
-
         for stream in server.listener.incoming() {
             let stream = stream?;
             let media_type_map = server.media_type_map.clone();
@@ -82,7 +81,10 @@ impl Server {
         }
 
         let header = RequestHeader::new(string);
-        let (code, mime_type, content_length, path) = if let Some(header) = header {
+        
+        let (code, mime_type, content_length, path,entity_tag) = if let Some(header) = header {
+            let default_etag = "unknown-input-etag".to_string();
+            let request_etag = header.get_entity_tag().unwrap_or(default_etag);
             let code;
             let path = header.get_path().to_owned();
             let path = if path == "/" {
@@ -101,30 +103,39 @@ impl Server {
             let mut content_length: usize = 0;
             match FileReader::new(&root_path, &path) {
                 Ok(file_reader) => {
-                    match file_reader.get_size() {
-                        Ok(length) => {
-                            code = 200;
-                            content_length = length.try_into().unwrap_or(0);
+                    let file_etag = format!("\"{}\"",file_reader.get_entity_tag());
+                    if request_etag == file_etag{
+                        println!("Matches!");
+                        (304,mime_type.to_string(),0usize,None,request_etag.to_string())
+                    }else{
+                        println!("Don't match. left: {}, right: {}",request_etag,file_etag);
+                        match file_reader.get_size() {
+                            Ok(length) => {
+                                code = 200;
+                                content_length = length.try_into().unwrap_or(0);
+                            }
+                            Err(err) => match err.kind() {
+                                io::ErrorKind::NotFound => {
+                                    code = 404;
+                                }
+                                io::ErrorKind::PermissionDenied => {
+                                    code = 403;
+                                }
+                                _ => {
+                                    code = 404;
+                                }
+                            },
                         }
-                        Err(err) => match err.kind() {
-                            io::ErrorKind::NotFound => {
-                                code = 404;
-                            }
-                            io::ErrorKind::PermissionDenied => {
-                                code = 403;
-                            }
-                            _ => {
-                                code = 404;
-                            }
-                        },
+                        println!(" - {}", code);
+
+                        (code, mime_type.to_owned(), content_length, Some(path),file_reader.get_entity_tag())
                     }
-                    println!(" - {}", code);
-                    (code, mime_type.to_owned(), content_length, Some(path))
+                    
                 }
-                Err(_) => (404, "".to_owned(), 0, None),
+                Err(_) => (404, "".to_owned(), 0, None, "".to_string()),
             }
         } else {
-            (400, "".to_owned(), 0, None)
+            (400, "".to_owned(), 0, None,"".to_string())
         };
 
         // send response headers
@@ -134,6 +145,8 @@ impl Server {
         }
         response_header.insert_field("Content-Length".to_string(), content_length.to_string());
         response_header.insert_field("Server".to_string(), "A.D.O.W.S.".to_string());
+        response_header.insert_field("Cache-Control".to_string(), "public".to_string());
+        response_header.insert_field("ETag".to_string(), entity_tag);
         // response_header.insert_field("Connection".to_string(), "keep-alive".to_string());
         let response_header = response_header.to_string();
         let mut response = Vec::with_capacity(response_header.len() + content_length);
