@@ -105,10 +105,8 @@ impl Server {
                 Ok(file_reader) => {
                     let file_etag = format!("\"{}\"",file_reader.get_entity_tag());
                     if request_etag == file_etag{
-                        println!("Matches!");
                         (304,mime_type.to_string(),0usize,None,request_etag.to_string())
                     }else{
-                        println!("Don't match. left: {}, right: {}",request_etag,file_etag);
                         match file_reader.get_size() {
                             Ok(length) => {
                                 code = 200;
