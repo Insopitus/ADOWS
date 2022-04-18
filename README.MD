@@ -31,10 +31,11 @@ For now, ADOWS has meet its goal for common usage. It's fast, stable, memory saf
 
 **Todos:**
 1. implement keep-alive header to boost performance
-1. error recovery;
-1. more http header supports;
-1. to use more reference(lifetime), less clones.
-1. logging requester's ip, time requested, etc.
-1. security: don't know if it's nessassary.
-1. HTTP/2.0 support, maybe?
-1. gzip: may need external crates.
+2. security issue if the user tries to access file outside the root directory;
+3. error recovery;
+4. more http header supports;
+5. to use more reference(lifetime), less clones.
+6. logging requester's ip, time requested, etc.
+7. security: don't know if it's nessassary.
+8. HTTP/2.0 support, maybe?
+9. gzip: may need external crates.
