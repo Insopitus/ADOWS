@@ -103,7 +103,7 @@ impl Server {
             let mut content_length: usize = 0;
             match FileReader::new(&root_path, &path) {
                 Ok(file_reader) => {
-                    let file_etag = format!("\"{}\"",file_reader.get_entity_tag());
+                    let file_etag = file_reader.get_entity_tag();
                     if request_etag == file_etag{
                         (304,mime_type.to_string(),0usize,None,request_etag.to_string())
                     }else{
