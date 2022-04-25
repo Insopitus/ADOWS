@@ -1,5 +1,5 @@
 use super::utils::percent_decode;
-
+/// a structure implements URI String
 pub struct URI<'a>{
   str:&'a str
 }

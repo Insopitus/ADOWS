@@ -27,6 +27,7 @@ impl ResponseHeader {
     pub fn insert_field(&mut self,k:String,v:String){
         self.header_fields.insert(k, v);
     }
+    /// make a valid valid http header string
     pub fn to_string(&self) -> String {
         format!("{}\r\n{}\r\n",self.response_line,self.header_fields.to_string())
     }
