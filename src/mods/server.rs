@@ -1,6 +1,6 @@
 use std::{
     io::{self, BufRead, BufReader, Write},
-    net::{self, TcpListener, TcpStream},
+    net::{self, TcpStream},
     sync::Arc,
 };
 
