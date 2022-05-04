@@ -67,6 +67,16 @@ fn ascii_hex_char_byte_to_number(b: u8) -> Option<u8> {
     }
 }
 
+/// auto start the browser (windows)
+pub fn open_browser(port: u32) {
+    std::process::Command::new("cmd.exe")
+        .arg("/C")
+        .arg("start")
+        .arg(format!("http://localhost:{}", port))
+        .spawn()
+        .ok();
+}
+
 #[cfg(test)]
 mod test {
     use super::percent_decode;

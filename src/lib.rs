@@ -23,6 +23,7 @@ pub fn run(mut port: u32, path: String) {
     }
     println!("Press Enter to continue.");
     std::io::stdin().read_line(&mut String::new()).unwrap_or(0);
+    mods::utils::open_browser(port);
 }
 
 

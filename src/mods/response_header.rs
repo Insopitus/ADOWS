@@ -1,11 +1,23 @@
 use super::header_fields::HeaderFields;
 
+#[derive(Debug)]
 pub struct ResponseHeader {
     response_line: String,
     header_fields: HeaderFields,
 }
 impl ResponseHeader {
     pub fn new(code: u32) -> Self {
+        
+        let header_fields = HeaderFields::new();
+        let mut header = ResponseHeader {
+            response_line:"".to_string(),
+            header_fields,
+        };
+        header.set_code(code);
+        
+        header
+    }
+    pub fn set_code(&mut self,code:u32)->&mut Self{
         let mut response_line = String::from("HTTP/1.1");
         response_line.push_str(" ");
         let code_desc = match code {
@@ -16,13 +28,8 @@ impl ResponseHeader {
             _ => "BAD REQUEST",
         };
         response_line.push_str(&format!("{} {}", &code.to_string(), code_desc));
-
-        let header_fields = HeaderFields::new();
-        
-        ResponseHeader {
-            response_line,
-            header_fields,
-        }
+        self.response_line = response_line;
+        self
     }
     pub fn insert_field(&mut self,k:String,v:String){
         self.header_fields.insert(k, v);
