@@ -29,7 +29,7 @@ impl RequestHeader {
         // dbg!(line_one);
         // request line (first line)
         let (method, path, version) = RequestHeader::parse_request_line(line_one);
-        let header_fields = RequestHeader::parse_header_fields(string);
+        let header_fields = RequestHeader::parse_header_fields(&string);
         if method == "" || path == "" || version == "" {
             None
         } else {
@@ -82,7 +82,7 @@ impl RequestHeader {
         let version = line_one_iter.next().unwrap_or("").to_string();
         (method, path, version)
     }
-    fn parse_header_fields(s: String) -> HashMap<String, String> {
+    fn parse_header_fields(s: &str) -> HashMap<String, String> {
         let header_fields = HeaderFields::from(s);
         header_fields.table().to_owned()
     }

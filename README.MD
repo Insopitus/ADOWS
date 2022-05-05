@@ -20,7 +20,7 @@ On the other hand, the project is written for learning and practising purpose. I
 
 For now, ADOWS has meet its goal for common usage. It's fast, stable, memory safe and uses little RAM (a few megabytes).
 
-**Features:**
+## Features:
 1. TCP connection handling;
 1. HTTP header parsing: not fully featured, just enough for a webpage host server;
 1. MIME type support for common media types;
@@ -29,13 +29,12 @@ For now, ADOWS has meet its goal for common usage. It's fast, stable, memory saf
 1. concurency;
 1. caching;
 
-**Todos:**
+## Todos:
 1. implement keep-alive header to boost performance
-2. security issue if the user tries to access file outside the root directory;
+1. fewer allocations (mostly strings)
+1. security issue if the user tries to access file outside the root directory;
 3. error recovery;
 4. more http header supports;
-5. to use more reference(lifetime), less clones.
 6. logging requester's ip, time requested, etc.
-7. security: don't know if it's nessassary.
 8. HTTP/2.0 support, maybe?
 9. gzip: may need external crates.

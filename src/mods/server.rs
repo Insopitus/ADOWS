@@ -1,16 +1,16 @@
 use std::{
     io::{self, BufRead, BufReader, Write},
     net::{self, TcpStream},
-    sync::Arc, fs::File,
+    sync::Arc,
 };
 
 use crate::{
-    mods::file_reader::{self, FileReader},
+    mods::file_reader::{FileReader},
     THREAD_POOL_SIZE,
 };
 
 use super::{
-    media_type::{self, MediaType},
+    media_type::{MediaType},
     request_header::RequestHeader,
     response_header::ResponseHeader,
     thread_pool::ThreadPool,
@@ -49,7 +49,12 @@ impl Server {
             let root_path = server.root_path.clone();
             thread_pool
                 .execute(move || {
-                    Server::handle_request(stream, media_type_map, root_path).unwrap();
+                    match Server::handle_request(stream, media_type_map, root_path){
+                        Ok(_)=>{},
+                        Err(e)=>{
+                            println!("{}",e);
+                        }
+                    }
                     // TODO may need handling
                 }).unwrap();
         }
@@ -61,9 +66,6 @@ impl Server {
         media_type_map: Arc<MediaType>,
         root_path: String,
     ) -> Result<(), crate::error::Error> {
-        
-        
-
         let request_header = Server::parse_request(&mut stream);
         let mut file_reader = None; // TODO use the same file reader instance
         let mut response_header = ResponseHeader::new(400);
@@ -88,8 +90,6 @@ impl Server {
                     response_header.insert_field("Content-Type".to_string(), mime_type.to_string());
                 }
             } 
-            dbg!(&root_path);
-            dbg!(&path);
             match FileReader::new(&root_path, &path) {
                 Ok(reader) => {
                     let file_etag = reader.get_entity_tag();
@@ -127,7 +127,6 @@ impl Server {
                     file_reader = Some(reader);
                 }
                 Err(_) =>{
-                    dbg!("here");
                     response_header.set_code(404);
                 } 
             };
@@ -141,7 +140,7 @@ impl Server {
 
         
         // send response headers
-        dbg!(&response_header);
+        // dbg!(&response_header);
         
         let response_header = response_header.to_string();
         let mut response = Vec::with_capacity(response_header.len() + content_length);
