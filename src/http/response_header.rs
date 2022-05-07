@@ -1,4 +1,4 @@
-use super::header_fields::HeaderFields;
+use super::HeaderFields;
 
 #[derive(Debug)]
 pub struct ResponseHeader {

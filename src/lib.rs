@@ -1,15 +1,16 @@
-pub mod mods;
+mod thread_pool;
+mod http;
+mod error;
+mod file_reader;
+mod server;
+mod utils;
 
-
-
-
-use crate::mods::server::Server;
 const THREAD_POOL_SIZE: usize = 5;
 pub fn run(mut port: u32, path: String) {
     loop {
-        let start = Server::start(&path, port);
+        let start = server::Server::start(&path, port);
         if let Err(e) = start {
-            if *e.kind() == crate::mods::error::ErrorKind::AddrInUse {
+            if *e.kind() == error::ErrorKind::AddrInUse {
                 port += 1;
                 continue;
             } else {

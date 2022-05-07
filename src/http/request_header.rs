@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
-use super::{header_fields::HeaderFields, utils::percent_decode};
+use super::HeaderFields;
+use crate::utils::percent_decode;
 
 /// An HTTP Request parser
 ///
@@ -17,7 +18,7 @@ pub struct RequestHeader {
     path: String,
     method: String,
     version: String,
-    header_fields: HashMap<String, String>,
+    header_fields: HeaderFields,
 }
 impl RequestHeader {
     /// returns `None` if the string is not a valid http request header
@@ -29,7 +30,7 @@ impl RequestHeader {
         // dbg!(line_one);
         // request line (first line)
         let (method, path, version) = RequestHeader::parse_request_line(line_one);
-        let header_fields = RequestHeader::parse_header_fields(&string);
+        let header_fields = HeaderFields::from(string.as_str());
         if method == "" || path == "" || version == "" {
             None
         } else {
@@ -77,14 +78,9 @@ impl RequestHeader {
             .next()
             .unwrap_or("")
             .to_string(); // remove query strings
-                          // TODO url decoding
         let path = percent_decode(&path);
         let version = line_one_iter.next().unwrap_or("").to_string();
         (method, path, version)
-    }
-    fn parse_header_fields(s: &str) -> HashMap<String, String> {
-        let header_fields = HeaderFields::from(s);
-        header_fields.table().to_owned()
     }
 }
 

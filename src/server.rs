@@ -4,17 +4,15 @@ use std::{
     sync::Arc,
 };
 
+use crate::THREAD_POOL_SIZE;
+
 use crate::{
-    THREAD_POOL_SIZE,
+    error,
+    file_reader::FileReader,
+    http::{MediaType, RequestHeader, ResponseHeader},
+    thread_pool::ThreadPool,
 };
 
-use super::{
-    media_type::{MediaType},
-    request_header::RequestHeader,
-    response_header::ResponseHeader,
-    thread_pool::ThreadPool, error,
-    file_reader::{FileReader},
-};
 
 pub struct Server {
     listener: net::TcpListener,
@@ -26,7 +24,7 @@ impl Server {
     pub fn start(root_path: &str, port: u32) -> Result<Self, error::Error> {
         let addr = format!("127.0.0.1:{}", port);
         let listener = net::TcpListener::bind(addr)?;
-        println!("Server listening at http://localhost:{}",port);
+        println!("Server listening at http://localhost:{}", port);
         let media_type_map: Arc<MediaType> = Arc::new(MediaType::new());
         let server = Server {
             listener,
@@ -49,18 +47,19 @@ impl Server {
             let root_path = server.root_path.clone();
             thread_pool
                 .execute(move || {
-                    match Server::handle_request(stream, media_type_map, root_path){
-                        Ok(_)=>{},
-                        Err(e)=>{
-                            println!("{}",e);
+                    match Server::handle_request(stream, media_type_map, root_path) {
+                        Ok(_) => {}
+                        Err(e) => {
+                            println!("{}", e);
                         }
                     }
                     // TODO may need handling
-                }).unwrap();
+                })
+                .unwrap();
         }
         Ok(())
     }
-    
+
     fn handle_request(
         mut stream: TcpStream,
         media_type_map: Arc<MediaType>,
@@ -89,20 +88,21 @@ impl Server {
                 if mime_type != "" {
                     response_header.insert_field("Content-Type".to_string(), mime_type.to_string());
                 }
-            } 
+            }
             match FileReader::new(&root_path, &path) {
                 Ok(reader) => {
                     let file_etag = reader.get_entity_tag();
-                    let code:u32;
-                    
-                    if request_etag == file_etag{
+                    let code: u32;
+
+                    if request_etag == file_etag {
                         code = 304;
-                    }else{
+                    } else {
                         match reader.get_size() {
                             Ok(length) => {
                                 code = 200;
                                 content_length = length.try_into().unwrap_or_default();
-                                response_header.insert_field("Content-Length".to_string(), length.to_string());
+                                response_header
+                                    .insert_field("Content-Length".to_string(), length.to_string());
                             }
                             Err(err) => {
                                 dbg!(&err);
@@ -119,37 +119,32 @@ impl Server {
                                 }
                             }
                         }
-                        
-                        response_header.insert_field("ETag".to_string(), reader.get_entity_tag().to_string());
+
+                        response_header
+                            .insert_field("ETag".to_string(), reader.get_entity_tag().to_string());
                     }
                     println!(" - {}", code);
                     response_header.set_code(code);
                     file_reader = Some(reader);
                 }
-                Err(_) =>{
+                Err(_) => {
                     response_header.set_code(404);
-                } 
+                }
             };
-
-        }else{
+        } else {
             response_header.set_code(400);
         }
 
-        
-        
-
-        
         // send response headers
         // dbg!(&response_header);
-        
+
         let response_header = response_header.to_string();
         let mut response = Vec::with_capacity(response_header.len() + content_length);
         response.append(&mut response_header.as_bytes().into());
         stream.write(&response)?;
         stream.flush()?;
         // send response body
-        if let Some(mut reader) = file_reader {            
-
+        if let Some(mut reader) = file_reader {
             for bytes in reader.read_chunked_as_bytes()? {
                 stream.write(&bytes)?;
                 stream.flush()?;
@@ -159,7 +154,7 @@ impl Server {
     }
 
     /// parse the request head and return a RequestHeader struct
-    fn parse_request(mut stream:&TcpStream)->Option<RequestHeader>{
+    fn parse_request(mut stream: &TcpStream) -> Option<RequestHeader> {
         let mut reader = BufReader::new(&mut stream);
         let mut string = String::with_capacity(1024);
 
@@ -232,13 +227,13 @@ impl Server {
     //                     println!(" - {}", code);
     //                     entity_tag = file_reader.get_entity_tag();
     //                 }
-                    
+
     //             }
     //             Err(_) =>{
     //                 code = 404;
     //                 content_length = 0;
     //                 entity_tag = "".to_string();
-    //             } 
+    //             }
     //         };
     //     }
     //     let mut response_header = ResponseHeader::new(code);
@@ -253,13 +248,10 @@ impl Server {
     //         }
     //         response_header.insert_field("Content-Length".to_string(), content_length.to_string());
     //         response_header.insert_field("Server".to_string(), "A.D.O.W.S.".to_string());
-    //         response_header.insert_field("Cache-Control".to_string(), "public".to_string());        
+    //         response_header.insert_field("Cache-Control".to_string(), "public".to_string());
     //         // response_header.insert_field("Connection".to_string(), "keep-alive".to_string());
     //     }
     //     (response_header,path,content_length)
 
     // }
-
-
-
 }

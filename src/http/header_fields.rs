@@ -28,6 +28,10 @@ impl HeaderFields {
     pub fn table(&self) -> &HashMap<String, String> {
         &self.map
     }
+
+    pub fn get(&self,key:&str)->Option<&String>{
+        self.map.get(key)
+    }
 }
 impl From<&str> for HeaderFields {
     fn from(s: &str) -> Self {
