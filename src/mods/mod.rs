@@ -9,4 +9,6 @@ pub mod uri;
 pub mod server;
 pub mod file_reader;
 pub mod cache;
+pub mod error;
+pub mod cli;
 

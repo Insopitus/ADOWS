@@ -5,7 +5,6 @@ use std::{
 };
 
 use crate::{
-    mods::file_reader::{FileReader},
     THREAD_POOL_SIZE,
 };
 
@@ -13,7 +12,8 @@ use super::{
     media_type::{MediaType},
     request_header::RequestHeader,
     response_header::ResponseHeader,
-    thread_pool::ThreadPool,
+    thread_pool::ThreadPool, error,
+    file_reader::{FileReader},
 };
 
 pub struct Server {
@@ -23,7 +23,7 @@ pub struct Server {
     media_type_map: Arc<MediaType>,
 }
 impl Server {
-    pub fn start(root_path: &str, port: u32) -> Result<Self, crate::error::Error> {
+    pub fn start(root_path: &str, port: u32) -> Result<Self, error::Error> {
         let addr = format!("127.0.0.1:{}", port);
         let listener = net::TcpListener::bind(addr)?;
         println!("Server listening at http://localhost:{}",port);
@@ -39,7 +39,7 @@ impl Server {
 
         Ok(server)
     }
-    fn init(server: &Server) -> Result<(), crate::error::Error> {
+    fn init(server: &Server) -> Result<(), error::Error> {
         // Server::open_browser(server.port);
 
         let thread_pool = ThreadPool::new(THREAD_POOL_SIZE);
@@ -65,7 +65,7 @@ impl Server {
         mut stream: TcpStream,
         media_type_map: Arc<MediaType>,
         root_path: String,
-    ) -> Result<(), crate::error::Error> {
+    ) -> Result<(), error::Error> {
         let request_header = Server::parse_request(&mut stream);
         let mut file_reader = None; // TODO use the same file reader instance
         let mut response_header = ResponseHeader::new(400);

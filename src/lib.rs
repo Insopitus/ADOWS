@@ -1,4 +1,3 @@
-pub mod error;
 pub mod mods;
 
 
@@ -10,7 +9,7 @@ pub fn run(mut port: u32, path: String) {
     loop {
         let start = Server::start(&path, port);
         if let Err(e) = start {
-            if *e.kind() == crate::error::ErrorKind::AddrInUse {
+            if *e.kind() == crate::mods::error::ErrorKind::AddrInUse {
                 port += 1;
                 continue;
             } else {
