@@ -18,7 +18,7 @@ pub fn parse_cli(line: &str) -> Result<CliOptions,&str> {
 
 #[derive(PartialEq, Debug)]
 pub struct CliOptions {
-    pub port: u64,
+    pub port: u16,
     pub dir: PathBuf,
     pub threads: usize,
 }

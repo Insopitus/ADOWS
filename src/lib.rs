@@ -1,12 +1,12 @@
-mod thread_pool;
+mod concurrency;
 mod http;
 mod error;
-mod file_reader;
+mod fs;
 mod server;
 mod utils;
 
 const THREAD_POOL_SIZE: usize = 5;
-pub fn run(mut port: u32, path: String) {
+pub fn run(mut port: u16, path: String) {
     loop {
         let start = server::Server::start(&path, port);
         if let Err(e) = start {

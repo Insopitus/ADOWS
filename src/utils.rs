@@ -54,7 +54,7 @@ pub fn percent_decode(string: &str) -> String {
     String::from_utf8_lossy(&result).to_string()
 }
 
-/// convert a utf-8 character that represents a hex value
+/// convert a ascii character that represents a hex value
 ///  to its numeric value, e.g. b'A' -> 10
 /// 
 /// returns Options::None if it's not a valid Hex character e.g. b'U'
@@ -68,14 +68,16 @@ fn ascii_hex_char_byte_to_number(b: u8) -> Option<u8> {
 }
 
 /// auto start the browser (windows)
-pub fn open_browser(port: u32) {
+pub fn open_browser(port: u16) {
     std::process::Command::new("cmd.exe")
         .arg("/C")
         .arg("start")
         .arg(format!("http://localhost:{}", port))
         .spawn()
-        .ok();
+        .ok(); // if it fails, it fails.
 }
+
+
 
 #[cfg(test)]
 mod test {

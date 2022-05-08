@@ -8,20 +8,20 @@ use crate::THREAD_POOL_SIZE;
 
 use crate::{
     error,
-    file_reader::FileReader,
+    fs::FileReader,
     http::{MediaType, RequestHeader, ResponseHeader},
-    thread_pool::ThreadPool,
+    concurrency::ThreadPool,
 };
 
 
 pub struct Server {
     listener: net::TcpListener,
     root_path: String,
-    port: u32,
+    port: u16,
     media_type_map: Arc<MediaType>,
 }
 impl Server {
-    pub fn start(root_path: &str, port: u32) -> Result<Self, error::Error> {
+    pub fn start(root_path: &str, port: u16) -> Result<Self, error::Error> {
         let addr = format!("127.0.0.1:{}", port);
         let listener = net::TcpListener::bind(addr)?;
         println!("Server listening at http://localhost:{}", port);
