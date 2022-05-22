@@ -38,7 +38,7 @@ impl FileReader {
         let length = metadata.len();
         let chunks = FileChunksReader {
             reader: &mut self.reader,
-            bytes_remaining: length.try_into().unwrap_or(0),
+            bytes_remaining: length,
         };
         Ok(chunks)
     }

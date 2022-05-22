@@ -65,7 +65,7 @@ impl Server {
         media_type_map: Arc<MediaType>,
         root_path: String,
     ) -> Result<(), error::Error> {
-        let request_header = Server::parse_request(&mut stream);
+        let request_header = Server::parse_request(&stream);
         let mut file_reader = None; // TODO use the same file reader instance
         let mut response_header = ResponseHeader::new(400);
         let mut content_length = 0usize;
@@ -82,10 +82,10 @@ impl Server {
             print!("Request: {}", path);
 
             // mime type
-            let suffix = path.split(".").last();
+            let suffix = path.split('.').last();
             if let Some(suffix) = suffix {
                 let mime_type = media_type_map.get_mime_type(suffix).unwrap_or("");
-                if mime_type != "" {
+                if !mime_type.is_empty() {
                     response_header.insert_field("Content-Type".to_string(), mime_type.to_string());
                 }
             }
@@ -121,35 +121,38 @@ impl Server {
                         }
 
                         response_header
-                            .insert_field("ETag".to_string(), reader.get_entity_tag().to_string());
+                            .insert_field("ETag".to_string(), reader.get_entity_tag());
                     }
                     println!(" - {}", code);
-                    response_header.set_code(code);
+                    response_header.code = code;
                     file_reader = Some(reader);
                 }
                 Err(_) => {
-                    response_header.set_code(404);
+                    response_header.code = 404;
                 }
             };
         } else {
-            response_header.set_code(400);
+            response_header.code = 400;
         }
 
         // send response headers
         // dbg!(&response_header);
 
-        let response_header = response_header.to_string();
-        let mut response = Vec::with_capacity(response_header.len() + content_length);
-        response.append(&mut response_header.as_bytes().into());
-        stream.write(&response)?;
+        let response_header_string = response_header.to_string();
+        let mut response = Vec::with_capacity(response_header_string.len() + content_length);
+        response.append(&mut response_header_string.as_bytes().into());
+        stream.write_all(&response)?;
         stream.flush()?;
         // send response body
-        if let Some(mut reader) = file_reader {
-            for bytes in reader.read_chunked_as_bytes()? {
-                stream.write(&bytes)?;
-                stream.flush()?;
+        if response_header.code == 200 {
+            if let Some(mut reader) = file_reader {
+                for bytes in reader.read_chunked_as_bytes()? {
+                    stream.write_all(&bytes)?;
+                    stream.flush()?;
+                }
             }
         }
+        
         Ok(())
     }
 

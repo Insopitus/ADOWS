@@ -1,7 +1,6 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt::Display};
 
 /// header fileds for request/response headers
-#[derive(Debug)]
 pub struct HeaderFields {
     map: HashMap<String, String>,
 }
@@ -15,15 +14,6 @@ impl HeaderFields {
     pub fn insert(&mut self, k: String, v: String) {
         self.map.insert(k, v);
     }
-    /// consumes the struct instance
-    pub fn to_string(&self) -> String {
-        let mut result = String::new();
-        for (key, value) in self.map.iter() {
-            let line = format!("{}: {}\r\n", &key, &value);
-            result.push_str(&line);
-        }
-        result
-    }
     /// return the hashmap of field pairs
     pub fn table(&self) -> &HashMap<String, String> {
         &self.map
@@ -33,6 +23,16 @@ impl HeaderFields {
         self.map.get(key)
     }
 }
+impl Display for HeaderFields{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut result = String::new();
+        for (key, value) in self.map.iter() {
+            let line = format!("{}: {}\r\n", &key, &value);
+            result.push_str(&line);
+        }
+        write!(f,"{}", result) // TODO does it allocate twice?
+    }
+}
 impl From<&str> for HeaderFields {
     fn from(s: &str) -> Self {
         let mut map = HashMap::new();
@@ -40,7 +40,7 @@ impl From<&str> for HeaderFields {
             match line {
                 "" => break,
                 l => {
-                    let mut split = l.split(":");
+                    let mut split = l.split(':');
                     // dbg!(&split.collect::<Vec<_>>());
 
                     let key;
@@ -50,13 +50,13 @@ impl From<&str> for HeaderFields {
                         key = k.to_owned();
                     } else {
                         continue;
-                    }
+                    };
                     let v = split.next();
                     if let Some(v) = v {
                         value = v.trim().to_owned();
                     } else {
                         continue;
-                    }
+                    };
 
                     map.insert(key, value);
                 }

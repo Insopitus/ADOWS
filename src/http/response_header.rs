@@ -1,42 +1,42 @@
+use std::fmt::Display;
+
 use super::HeaderFields;
 
-#[derive(Debug)]
 pub struct ResponseHeader {
-    response_line: String,
+    pub code:u32,
     header_fields: HeaderFields,
 }
 impl ResponseHeader {
     pub fn new(code: u32) -> Self {
         
         let header_fields = HeaderFields::new();
-        let mut header = ResponseHeader {
-            response_line:"".to_string(),
+        ResponseHeader {
+            code,
             header_fields,
-        };
-        header.set_code(code);
-        
-        header
+        }
     }
-    pub fn set_code(&mut self,code:u32)->&mut Self{
+    pub fn insert_field(&mut self,k:String,v:String){
+        self.header_fields.insert(k, v);
+    }   
+    /// create response line from code
+    fn get_response_line(&self)->String{
         let mut response_line = String::from("HTTP/1.1");
-        response_line.push_str(" ");
-        let code_desc = match code {
+        response_line.push(' ');
+        let code_desc = match self.code {
             200 => "OK",
             304 => "NOT MODIFIED",
             400 => "BAD REQUEST",
             404 => "NOT FOUND",
             _ => "BAD REQUEST",
         };
-        response_line.push_str(&format!("{} {}", &code.to_string(), code_desc));
-        self.response_line = response_line;
-        self
+        response_line.push_str(&format!("{} {}", &self.code.to_string(), code_desc));
+        response_line
     }
-    pub fn insert_field(&mut self,k:String,v:String){
-        self.header_fields.insert(k, v);
-    }
-    /// make a valid http header string
-    pub fn to_string(&self) -> String {
-        format!("{}\r\n{}\r\n",self.response_line,self.header_fields.to_string())
+}
+impl Display for ResponseHeader {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let response_line = self.get_response_line();
+        write!(f,"{}\r\n{}\r\n",response_line,self.header_fields.to_string())
     }
 }
 

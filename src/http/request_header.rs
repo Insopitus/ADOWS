@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 
 use super::HeaderFields;
 use crate::utils::percent_decode;
@@ -25,13 +24,13 @@ impl RequestHeader {
     pub fn new(string: String) -> Option<Self> {
         // println!("{}", &original_string);
         let mut lines = string.split("\r\n"); // http headers are separeted by CRLFs
-        let line_one = lines.nth(0);
+        let line_one = lines.next();
         let line_one = line_one?;
         // dbg!(line_one);
         // request line (first line)
         let (method, path, version) = RequestHeader::parse_request_line(line_one);
         let header_fields = HeaderFields::from(string.as_str());
-        if method == "" || path == "" || version == "" {
+        if method.is_empty() || path.is_empty() || version.is_empty() {
             None
         } else {
             Some(RequestHeader {
@@ -62,19 +61,16 @@ impl RequestHeader {
             .unwrap_or(0) // TODO maybe shouldn't return 0 if parse failed
     }
     pub fn get_entity_tag(&self)->Option<String>{
+        self.header_fields.get("If-None-Match").map(|s| s.trim().to_string())
         
-        match self.header_fields.get("If-None-Match") {
-            Some(s)=>Some(s.trim().to_string()),
-            None=>None
-        }
     }
     fn parse_request_line(line_one: &str) -> (String, String, String) {
-        let mut line_one_iter = line_one.split(" ");
+        let mut line_one_iter = line_one.split(' ');
         let method = line_one_iter.next().unwrap_or("").to_string();
         let path = line_one_iter
             .next()
             .unwrap_or("")
-            .split("?")
+            .split('?')
             .next()
             .unwrap_or("")
             .to_string(); // remove query strings

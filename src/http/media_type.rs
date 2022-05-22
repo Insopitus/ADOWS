@@ -123,6 +123,6 @@ impl MediaType {
 	/// if unknown, return `None`;
 	/// should not return a "universal" mime type for unknown file extensions
     pub fn get_mime_type(&self, suffix: &str) -> Option<&str> {
-        self.map.get(suffix).map(|s| *s)
+        self.map.get(suffix).copied()
     }
 }

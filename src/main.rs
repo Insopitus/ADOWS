@@ -1,7 +1,7 @@
 use std::env;
 
 fn main() {
-    let path = env::args().skip(1).next().unwrap_or_else(|| {
+    let path = env::args().nth(1).unwrap_or_else(|| {
         // set current directory as target if param is not provided
         // "www".to_string()
         env::current_dir()

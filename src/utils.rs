@@ -1,52 +1,48 @@
 /// percent decoding for URIs
-/// 
+///
 /// returns the original characters when meeting invalid percent encoding e.g. "%7s"->"%7s"
 pub fn percent_decode(string: &str) -> String {
-    let mut bytes = string.as_bytes().into_iter();
+    let mut bytes = string.as_bytes().iter();
     let mut result: Vec<u8> = Vec::with_capacity(bytes.len());
-    loop {
-        match bytes.next() {
-            Some(b) => match b {
-                b'%' => {
-                    let first;
-                    let second;
-                    match bytes.next() {
-                        Some(b) => {
-                            first = *b;
-                            match bytes.next() {
-                                Some(b) => {
-                                    second = *b;
-                                    let first_int = ascii_hex_char_byte_to_number(first);
 
-                                    let second_int = ascii_hex_char_byte_to_number(second);
-                                    if first_int.is_none() || second_int.is_none() {
-                                        result.push(b'%');
-                                        result.push(first);
-                                        result.push(second);
-                                        continue;
-                                    }
-                                    let first_int = first_int.unwrap();
-                                    let second_int = second_int.unwrap();
-                                    let byte = first_int << 4 | second_int;
-                                    result.push(byte);
-                                }
-                                None => {
+    while let Some(b) = bytes.next() {
+        match b {
+            b'%' => {
+                let first;
+                let second;
+                match bytes.next() {
+                    Some(b) => {
+                        first = *b;
+                        match bytes.next() {
+                            Some(b) => {
+                                second = *b;
+                                let first_int = ascii_hex_char_byte_to_number(first);
+
+                                let second_int = ascii_hex_char_byte_to_number(second);
+                                if first_int.is_none() || second_int.is_none() {
                                     result.push(b'%');
                                     result.push(first);
+                                    result.push(second);
+                                    continue;
                                 }
+                                let first_int = first_int.unwrap();
+                                let second_int = second_int.unwrap();
+                                let byte = first_int << 4 | second_int;
+                                result.push(byte);
+                            }
+                            None => {
+                                result.push(b'%');
+                                result.push(first);
                             }
                         }
-                        None => {
-                            result.push(b'%');
-                        }
+                    }
+                    None => {
+                        result.push(b'%');
                     }
                 }
-                other => {
-                    result.push(*other);
-                }
-            },
-            None => {
-                break;
+            }
+            other => {
+                result.push(*other);
             }
         }
     }
@@ -56,7 +52,7 @@ pub fn percent_decode(string: &str) -> String {
 
 /// convert a ascii character that represents a hex value
 ///  to its numeric value, e.g. b'A' -> 10
-/// 
+///
 /// returns Options::None if it's not a valid Hex character e.g. b'U'
 fn ascii_hex_char_byte_to_number(b: u8) -> Option<u8> {
     match b {
@@ -76,8 +72,6 @@ pub fn open_browser(port: u16) {
         .spawn()
         .ok(); // if it fails, it fails.
 }
-
-
 
 #[cfg(test)]
 mod test {
