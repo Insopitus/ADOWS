@@ -1,6 +1,6 @@
-# ADOWS, A Drag-Onto Web Server.
+# ADOWS
 
-ADOWS is a small program that you can drag-drop your static webpage file folder to it to start a web server that hosts your webpage.
+ADOWS is a small program that runs a local http server to host you web page.
 
 ## Usage
 
@@ -10,21 +10,19 @@ ADOWS is a small program that you can drag-drop your static webpage file folder 
 
 3. The server starts at `http://localhost:8080/` by default, if the port `8080` is in use, ADOWS will try to use `8081`, `8082`, until it finds an available port.
 
-*ADOWS works on linux, through you have to build it yourself.*
+*for linux users, you have to run `cargo build --release` to build it on your machine and run adows in the terminal.
 
 ## Description
 
 This project is based on the official rust book's "build a web server" chapter. The original one is very rough, unstable and lacks a lot of features. My goal is to add more funtionality to it and make it robust. 
 
-On the other hand, the project is written for learning and practising purpose. I avoid using third-party libraries/crates to get a better understanding of how things work. As a result, ADOWS may not be production-ready at any moment, but it should be enough for general use case.
-
-For now, ADOWS has meet its goal for common usage. It's fast, stable, memory safe and uses little RAM (a few megabytes).
+On the other hand, the project is written for learning and practising purpose. I avoid using third-party libraries/crates so I can get a better understanding of how things work, which also makes the executable minimal. As a result, adows is not feature rich but meets the basic needs for a static file http server.
 
 ## Features:
 1. TCP connection handling;
-1. HTTP header parsing: not fully featured, just enough for a webpage host server;
+1. HTTP header parsing: not fully featured, but enough for static webpages;
 1. MIME type support for common media types;
-1. URI decoding to support non-ASCII directory/file names;
+1. URI decoding to support non-ASCII directory/file names, (they still have to be valid unicode though);
 1. file chunk reading so the server won't use too many RAM while hosting large files;
 1. concurency;
 1. caching;
@@ -32,9 +30,10 @@ For now, ADOWS has meet its goal for common usage. It's fast, stable, memory saf
 ## Todos:
 1. implement keep-alive header to boost performance
 1. fewer allocations (mostly strings)
-1. security issue if the user tries to access file outside the root directory;
 3. error recovery;
-4. more http header supports;
 6. logging requester's ip, time requested, etc.
-8. HTTP/2.0 support, maybe?
-9. gzip: may need external crates.
+
+## May Not Do
+1. more http header supports, only if it's needed;
+8. HTTP/2.0 support
+9. gzip and other compressions
