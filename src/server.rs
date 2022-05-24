@@ -17,11 +17,11 @@ use crate::{
 pub struct Server {
     listener: net::TcpListener,
     root_path: String,
-    port: u16,
+    pub port: u16,
     media_type_map: Arc<MediaType>,
 }
 impl Server {
-    pub fn start(root_path: &str, port: u16) -> Result<Self, error::Error> {
+    pub fn new(root_path: &str,port: u16) -> Result<Self, error::Error> {
         let addr = format!("127.0.0.1:{}", port);
         let listener = net::TcpListener::bind(addr)?;
         println!("Server listening at http://localhost:{}", port);
@@ -33,18 +33,14 @@ impl Server {
             media_type_map,
         };
 
-        Server::init(&server)?;
-
         Ok(server)
     }
-    fn init(server: &Server) -> Result<(), error::Error> {
-        // Server::open_browser(server.port);
-
+    pub fn listen(&mut self)->Result<(),error::Error>{
         let thread_pool = ThreadPool::new(THREAD_POOL_SIZE);
-        for stream in server.listener.incoming() {
+        for stream in self.listener.incoming() {
             let stream = stream?;
-            let media_type_map = server.media_type_map.clone();
-            let root_path = server.root_path.clone();
+            let media_type_map = self.media_type_map.clone();
+            let root_path = self.root_path.clone();
             thread_pool
                 .execute(move || {
                     match Server::handle_request(stream, media_type_map, root_path) {
@@ -59,6 +55,7 @@ impl Server {
         }
         Ok(())
     }
+
 
     fn handle_request(
         mut stream: TcpStream,
