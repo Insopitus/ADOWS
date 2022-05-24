@@ -1,3 +1,5 @@
+use std::env::Args;
+
 /// percent decoding for URIs
 ///
 /// returns the original characters when meeting invalid percent encoding e.g. "%7s"->"%7s"
@@ -73,8 +75,12 @@ pub fn open_browser(port: u16) {
         .ok(); // if it fails, it fails.
 }
 
+pub fn cli_args_parse(args:Args){
+
+}
+
 #[cfg(test)]
-mod test {
+mod test_decode {
     use super::percent_decode;
 
     #[test]

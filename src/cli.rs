@@ -1,27 +1,31 @@
-use std::path::{PathBuf, Path};
+use std::{path::{PathBuf, Path}, env::Args};
 
-/// cli options parser
+/// cli options struct
 ///
-/// `--port` `-p` => `u32` : the port adows uses
+/// `--port`, `-p` => `u32` : the port adows uses
 ///
-/// `--dir` `-d` => `String` : the dir of the files that you want adows
+/// `--dir`, `-d` => `String` : the dir of the files that you want adows
 /// to host (use current directory by default)
+/// 
+/// `--help`,`-h` prints out the available args
 ///
-pub fn parse_cli(line: &str) -> Result<CliOptions,&str> {
-   
-    Ok(CliOptions {
-        port: 0,
-        dir: PathBuf::new(),
-        threads: 4,
-    })
-}
-
 #[derive(PartialEq, Debug)]
-pub struct CliOptions {
+pub struct Config {
     pub port: u16,
     pub dir: PathBuf,
-    pub threads: usize,
 }
+
+impl Config {
+    /// parse the args (collected as array slice of strings) to create a config
+    fn parse(args:&[String]){
+
+    }
+}
+
+
+
+
+
 
 // #[cfg(test)]
 // mod test {

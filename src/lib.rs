@@ -4,6 +4,7 @@ mod fs;
 mod http;
 mod server;
 mod utils;
+mod cli;
 
 use server::Server;
 
