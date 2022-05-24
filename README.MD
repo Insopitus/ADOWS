@@ -30,8 +30,7 @@ On the other hand, the project is written for learning and practising purpose. I
 ## Todos:
 1. implement keep-alive header to boost performance
 1. fewer allocations (mostly strings)
-3. error recovery;
-6. logging requester's ip, time requested, etc.
+3. multi-thread error recovery;
 
 ## May Not Do
 1. more http header supports, only if it's needed;
