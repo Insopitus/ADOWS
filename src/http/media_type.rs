@@ -95,26 +95,7 @@ impl MediaType {
             ("3g2", "audio/video"),
             ("7z", "application/x-7z-compressed"),
         ]);
-        //   // basic front end
-        //   ("html", "text/html"),
-        //   ("css", "text/css"),
-        //   ("js", "text/javascript"),
-        //   ("json", "application/json"),
 
-        //   // images
-        //   ("jpg", "image/jpeg"),
-        //   ("jpeg", "image/jpeg"),
-        //   ("png", "image/png"),
-        //   ("svg", "image/svg+xml"),
-        //   ("gif", "image/gif"),
-        //   ("webp", "image/webp"),
-
-        //   // videos
-        //   ("mp4", "video/mp4"),
-        //   ("avi", "video/avi"),
-
-        //   // audio
-        //   ("mp3", "audio/mpeg"),
 
         MediaType { map }
     }
