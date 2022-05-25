@@ -3,6 +3,6 @@
 use adows::*;
 
 #[test]
-fn run_test(){
-    // run(8080, "/tests/assets/www/".to_string());
+fn create_server() {
+    Server::new("assets/www", 8080).unwrap();
 }

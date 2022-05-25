@@ -96,13 +96,12 @@ impl MediaType {
             ("7z", "application/x-7z-compressed"),
         ]);
 
-
         MediaType { map }
     }
 
-	/// return the mime type of a certain suffix; 
-	/// if unknown, return `None`;
-	/// should not return a "universal" mime type for unknown file extensions
+    /// return the mime type of a certain suffix;
+    /// if unknown, return `None`;
+    /// should not return a "universal" mime type for unknown file extensions
     pub fn get_mime_type(&self, suffix: &str) -> Option<&str> {
         self.map.get(suffix).copied()
     }

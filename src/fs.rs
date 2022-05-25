@@ -1,10 +1,12 @@
 use std::{
     fs::{self, File},
+    hash::{Hash, Hasher},
     io::{self, BufReader, Read},
-    path::{Path, PathBuf}, time::SystemTime, hash::{Hash, Hasher},
+    path::{Path, PathBuf},
+    time::SystemTime,
 };
 
-const CHUNK_SIZE: usize = 1024*64; // 64kb
+const CHUNK_SIZE: usize = 1024 * 64; // 64kb
 #[derive(Debug)]
 pub struct FileReader {
     path: PathBuf,
@@ -17,9 +19,9 @@ impl FileReader {
         let mut sub_path = Path::new(path);
         sub_path = sub_path.strip_prefix("/").unwrap_or(sub_path);
         sub_path = sub_path.strip_prefix("./").unwrap_or(sub_path);
-        
+
         let path = root_path.join(sub_path);
-        
+
         let file = File::open(&path)?;
         let reader = BufReader::new(file);
         Ok(FileReader { path, reader })
@@ -42,21 +44,19 @@ impl FileReader {
         };
         Ok(chunks)
     }
-    fn get_last_modified_time(&self)->Result<SystemTime,io::Error>{
+    fn get_last_modified_time(&self) -> Result<SystemTime, io::Error> {
         let metadata = fs::metadata(&self.path)?;
         metadata.modified()
     }
     /// for HTML ETag header. based on the last modified time for the moment
-    pub fn get_entity_tag(&self)->String{
+    pub fn get_entity_tag(&self) -> String {
         let mut hasher = std::collections::hash_map::DefaultHasher::new();
         match self.get_last_modified_time() {
-            Ok(time)=>{
+            Ok(time) => {
                 time.hash(&mut hasher);
-                format!("{:x}",hasher.finish())
-            },
-            Err(_)=>{
-                "unknown-time".to_string()
+                format!("{:x}", hasher.finish())
             }
+            Err(_) => "unknown-time".to_string(),
         }
     }
 }
@@ -84,7 +84,7 @@ impl<'a> Iterator for FileChunksReader<'a> {
 
         match self.reader.read(&mut content) {
             Ok(_) => Some(content),
-            Err(_) => None
+            Err(_) => None,
         }
     }
 }

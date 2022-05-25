@@ -7,12 +7,11 @@ use std::{
 use crate::THREAD_POOL_SIZE;
 
 use crate::{
+    concurrency::ThreadPool,
     error,
     fs::FileReader,
     http::{MediaType, RequestHeader, ResponseHeader},
-    concurrency::ThreadPool,
 };
-
 
 pub struct Server {
     listener: net::TcpListener,
@@ -21,7 +20,8 @@ pub struct Server {
     media_type_map: Arc<MediaType>,
 }
 impl Server {
-    pub fn new(root_path: &str,port: u16) -> Result<Self, error::Error> {
+    /// create a new server instance
+    pub fn new(root_path: &str, port: u16) -> Result<Self, error::Error> {
         let addr = format!("127.0.0.1:{}", port);
         let listener = net::TcpListener::bind(addr)?;
         println!("Server listening at http://localhost:{}", port);
@@ -35,7 +35,8 @@ impl Server {
 
         Ok(server)
     }
-    pub fn listen(&mut self)->Result<(),error::Error>{
+    /// listening connections
+    pub fn listen(&mut self) -> Result<(), error::Error> {
         let thread_pool = ThreadPool::new(THREAD_POOL_SIZE);
         for stream in self.listener.incoming() {
             let stream = stream?;
@@ -55,7 +56,6 @@ impl Server {
         }
         Ok(())
     }
-
 
     fn handle_request(
         mut stream: TcpStream,
@@ -117,8 +117,7 @@ impl Server {
                             }
                         }
 
-                        response_header
-                            .insert_field("ETag".to_string(), reader.get_entity_tag());
+                        response_header.insert_field("ETag".to_string(), reader.get_entity_tag());
                     }
                     println!(" - {}", code);
                     response_header.code = code;
@@ -149,7 +148,7 @@ impl Server {
                 }
             }
         }
-        
+
         Ok(())
     }
 

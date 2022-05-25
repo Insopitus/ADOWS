@@ -19,18 +19,18 @@ impl HeaderFields {
         &self.map
     }
 
-    pub fn get(&self,key:&str)->Option<&String>{
+    pub fn get(&self, key: &str) -> Option<&String> {
         self.map.get(key)
     }
 }
-impl Display for HeaderFields{
+impl Display for HeaderFields {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut result = String::new();
         for (key, value) in self.map.iter() {
             let line = format!("{}: {}\r\n", &key, &value);
             result.push_str(&line);
         }
-        write!(f,"{}", result) // TODO does it allocate twice?
+        write!(f, "{}", result) // TODO does it allocate twice?
     }
 }
 impl From<&str> for HeaderFields {
@@ -81,25 +81,31 @@ mod test {
     fn from_multi_line_string() {
         let lines = "Accept-Encoding: gzip, deflate, br\r\nAccept-Language: zh-CN,zh;q=0.9,en;q=0.8\r\nCache-Control: max-age=0\r\nConnection: keep-alive";
         let field = HeaderFields::from(lines);
-        assert_eq!(field.table().get("Accept-Encoding").unwrap(),"gzip, deflate, br");
-        assert_eq!(field.table().get("Accept-Language").unwrap(),"zh-CN,zh;q=0.9,en;q=0.8");
-        assert_eq!(field.table().get("Cache-Control").unwrap(),"max-age=0");
-        assert_eq!(field.table().get("Connection").unwrap(),"keep-alive");
+        assert_eq!(
+            field.table().get("Accept-Encoding").unwrap(),
+            "gzip, deflate, br"
+        );
+        assert_eq!(
+            field.table().get("Accept-Language").unwrap(),
+            "zh-CN,zh;q=0.9,en;q=0.8"
+        );
+        assert_eq!(field.table().get("Cache-Control").unwrap(), "max-age=0");
+        assert_eq!(field.table().get("Connection").unwrap(), "keep-alive");
     }
 
     #[test]
-    fn from_broken_string(){
+    fn from_broken_string() {
         let line = "Sec-Fetch-Dest:\r\nSec-Fetch-Site";
         let field = HeaderFields::from(line);
         let map = field.table();
-        assert_eq!(map.get("Sec-Fetch-Dest").unwrap(),"");
-        assert_eq!(map.get("Sec-Fetch-Site"),None);
+        assert_eq!(map.get("Sec-Fetch-Dest").unwrap(), "");
+        assert_eq!(map.get("Sec-Fetch-Site"), None);
     }
 
     #[test]
-    fn to_string(){
+    fn to_string() {
         let mut field = HeaderFields::new();
         field.insert("Upgrade-Insecure-Requests".to_string(), "1".to_string());
-        assert_eq!(field.to_string(),"Upgrade-Insecure-Requests: 1\r\n")
+        assert_eq!(field.to_string(), "Upgrade-Insecure-Requests: 1\r\n")
     }
 }

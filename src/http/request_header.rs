@@ -1,4 +1,3 @@
-
 use super::HeaderFields;
 use crate::utils::percent_decode;
 
@@ -60,9 +59,10 @@ impl RequestHeader {
             .parse::<usize>()
             .unwrap_or(0) // TODO maybe shouldn't return 0 if parse failed
     }
-    pub fn get_entity_tag(&self)->Option<String>{
-        self.header_fields.get("If-None-Match").map(|s| s.trim().to_string())
-        
+    pub fn get_entity_tag(&self) -> Option<String> {
+        self.header_fields
+            .get("If-None-Match")
+            .map(|s| s.trim().to_string())
     }
     fn parse_request_line(line_one: &str) -> (String, String, String) {
         let mut line_one_iter = line_one.split(' ');
@@ -82,7 +82,7 @@ impl RequestHeader {
 
 #[cfg(test)]
 mod test {
-  use super::RequestHeader;
+    use super::RequestHeader;
     #[test]
     fn standard_request_line() {
         let string = String::from("GET /index.html HTTP/1.1");

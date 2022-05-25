@@ -1,4 +1,7 @@
-use std::{path::{PathBuf, Path}, env::Args};
+use std::{
+    env::Args,
+    path::{Path, PathBuf},
+};
 
 /// cli options struct
 ///
@@ -6,7 +9,7 @@ use std::{path::{PathBuf, Path}, env::Args};
 ///
 /// `--dir`, `-d` => `String` : the dir of the files that you want adows
 /// to host (use current directory by default)
-/// 
+///
 /// `--help`,`-h` prints out the available args
 ///
 #[derive(PartialEq, Debug)]
@@ -17,15 +20,8 @@ pub struct Config {
 
 impl Config {
     /// parse the args (collected as array slice of strings) to create a config
-    fn parse(args:&[String]){
-
-    }
+    fn parse(args: &[String]) {}
 }
-
-
-
-
-
 
 // #[cfg(test)]
 // mod test {

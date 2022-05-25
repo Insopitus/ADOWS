@@ -11,7 +11,6 @@ fn main() {
     });
     let port = 8080;
     adows::run(port, path);
-    
 }
 
 // for tests
@@ -19,8 +18,8 @@ fn main() {
 //     use std::path::{Path,PathBuf};
 
 //     // let path = Path::new("").join("www").join("../style.css");
-//     let path = Path::new("./style.css");
-//     let path = path.strip_prefix("./").unwrap_or(path);
-//     dbg!(&path);
-    
+//     // let path = Path::new("./style.css");
+//     // let path = path.strip_prefix("./").unwrap_or(path);
+//     // dbg!(&path);
+
 // }

@@ -1,17 +1,17 @@
+mod cli;
 mod concurrency;
 mod error;
 mod fs;
 mod http;
 mod server;
 mod utils;
-mod cli;
-
-use server::Server;
+pub use server::Server;
 
 const THREAD_POOL_SIZE: usize = 5;
+
 pub fn run(mut port: u16, path: String) {
     loop {
-        let start = Server::new(&path,port);
+        let start = Server::new(&path, port);
         match start {
             Err(e) => {
                 if *e.kind() == error::ErrorKind::AddrInUse {
@@ -28,7 +28,6 @@ pub fn run(mut port: u16, path: String) {
                 break;
             }
         };
-      
     }
     println!("Press Enter to continue.");
     std::io::stdin().read_line(&mut String::new()).unwrap_or(0);
