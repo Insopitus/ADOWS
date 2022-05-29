@@ -29,10 +29,10 @@ impl FileReader {
     pub fn get_size(&self) -> Result<u64, io::Error> {
         Ok(fs::metadata(&self.path)?.len())
     }
-    pub fn read_as_string(&self) -> Result<String, io::Error> {
+    pub fn _read_as_string(&self) -> Result<String, io::Error> {
         fs::read_to_string(&self.path)
     }
-    pub fn read_as_bytes(&self) -> Result<Vec<u8>, io::Error> {
+    pub fn _read_as_bytes(&self) -> Result<Vec<u8>, io::Error> {
         fs::read(&self.path)
     }
     pub fn read_chunked_as_bytes(&mut self) -> Result<FileChunksReader, io::Error> {
@@ -103,10 +103,10 @@ mod tests {
         let reader = FileReader::new("", "tests/assets/file-reader.txt");
         assert!(reader.is_ok());
         let reader = reader.unwrap();
-        let result = reader.read_as_string();
+        let result = reader._read_as_string();
         assert!(result.is_ok());
-        assert_eq!(reader.read_as_string().unwrap(), "Hello, Reader");
-        assert_eq!(reader.read_as_bytes().unwrap(), b"Hello, Reader");
+        assert_eq!(reader._read_as_string().unwrap(), "Hello, Reader");
+        assert_eq!(reader._read_as_bytes().unwrap(), b"Hello, Reader");
     }
     #[test]
     fn chunked() {
