@@ -1,5 +1,5 @@
 use std::{
-    io::{self, BufRead, BufReader, Write},
+    io::{self, BufRead, BufReader, BufWriter, Write},
     net::{self, TcpStream},
     sync::Arc,
 };
@@ -58,7 +58,7 @@ impl Server {
     }
 
     fn handle_request(
-        mut stream: TcpStream,
+        stream: TcpStream,
         media_type_map: Arc<MediaType>,
         root_path: String,
     ) -> Result<(), error::Error> {
@@ -66,13 +66,13 @@ impl Server {
         let mut file_reader = None; // TODO use the same file reader instance
         let mut response_header = ResponseHeader::new(400);
         let mut content_length = 0usize;
-        let mut path = String::new();
+        let mut path:&str;
         if let Some(request_header) = request_header {
             let default_etag = "unknown-input-etag".to_string();
             let request_etag = request_header.get_entity_tag().unwrap_or(default_etag);
-            path = request_header.get_path().to_string();
+            path = request_header.get_path();
             path = if path == "/" {
-                "index.html".to_string() // redirect if path is empty
+                "index.html" // redirect if path is empty
             } else {
                 path
             };
@@ -86,7 +86,7 @@ impl Server {
                     response_header.insert_field("Content-Type".to_string(), mime_type.to_string());
                 }
             }
-            match FileReader::new(&root_path, &path) {
+            match FileReader::new(&root_path, path) {
                 Ok(reader) => {
                     let file_etag = reader.get_entity_tag();
                     let code: u32;
@@ -137,14 +137,15 @@ impl Server {
         let response_header_string = response_header.to_string();
         let mut response = Vec::with_capacity(response_header_string.len() + content_length);
         response.append(&mut response_header_string.as_bytes().into());
-        stream.write_all(&response)?;
-        stream.flush()?;
+        let mut writer = BufWriter::new(&stream);
+        writer.write_all(&response)?;
+        writer.flush()?;
         // send response body
         if response_header.code == 200 {
             if let Some(mut reader) = file_reader {
                 for bytes in reader.read_chunked_as_bytes()? {
-                    stream.write_all(&bytes)?;
-                    stream.flush()?;
+                    writer.write_all(&bytes)?;
+                    writer.flush()?;
                 }
             }
         }
