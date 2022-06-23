@@ -1,5 +1,6 @@
 use std::{
     env::Args,
+    io,
     path::{Path, PathBuf},
 };
 
@@ -18,29 +19,98 @@ pub struct Config {
     pub dir: PathBuf,
 }
 
-impl Config {
-    /// parse the args (collected as array slice of strings) to create a config
-    fn parse(args: &[String]) {}
+enum Paring {
+    Port,
+    Dir,
+    None,
 }
 
-// #[cfg(test)]
-// mod test {
-//     use super::*;
+impl Config {
+    /// parse the args (collected as array slice of strings) to create a config
+    pub fn parse(args: &[String]) -> io::Result<Self> {
+        let mut args = args.iter();
+        let mut port = 8080;
+        let mut dir = std::env::current_dir()?;
+        let mut paring = Paring::None;
+        loop {
+            match args.next() {
+                Some(s) => match s.as_str() {
+                    "--help" | "-h" => {
+                        println!("insert help text here");
+                        std::process::exit(0);
+                    }
+                    "--port" | "-p" => {
+                        paring = Paring::Port;
+                        continue;
+                    }
+                    "--dir" | "-d" => {
+                        paring = Paring::Dir;
+                        continue;
+                    }
+                    st => {
+                        match paring {
+                            Paring::Dir => {
+                                dir = PathBuf::from(st);
+                            }
+                            Paring::Port => {
+                                port = st.parse().expect("Unparsable port");
+                            }
+                            Paring::None => {
+                                continue;
+                            }
+                        }
+                        continue;
+                    }
+                },
+                None => {
+                    break;
+                }
+            };
+        }
+        Ok(Self { port, dir })
+    }
+}
 
-//     #[test]
-//     fn basic() {
-//         let options = parse_cli("--port 8080");
-//         assert_eq!(
-//             options,
-//             Ok(CliOptions {
-//                 port: 8080,
-//                 dir: PathBuf::new(),
-//                 threads: 4
-//             })
-//         );
-//     }
+#[cfg(test)]
+mod test {
+    use super::*;
 
-//     fn space_in_path() {
-//         let options = parse_cli(r#"-d "a folder/index.html""#);
-//     }
-// }
+    #[test]
+    fn basic() {
+        let options = Config::parse(&["--port".to_string(), "8080".to_string()]).unwrap();
+        assert_eq!(
+            options,
+            Config {
+                port: 8080,
+                dir: std::env::current_dir().unwrap(),
+            }
+        );
+    }
+    #[test]
+    fn basic_2() {
+        let options = Config::parse(&["--dir".to_string(), "/dev".to_string()]).unwrap();
+        assert_eq!(
+            options,
+            Config {
+                port: 8080,
+                dir: PathBuf::from("/dev"),
+            }
+        );
+    }
+    #[test]
+    fn basic_3() {
+        let options = Config::parse(&[
+            "--dir".to_string(), 
+            "/dev".to_string(),
+            "--port".to_string(),
+            "3000".to_string()
+            ]).unwrap();
+        assert_eq!(
+            options,
+            Config {
+                port: 3000,
+                dir: PathBuf::from("/dev"),
+            }
+        );
+    }
+}

@@ -1,4 +1,4 @@
-mod cli;
+pub mod cli;
 mod concurrency;
 mod error;
 mod fs;
@@ -6,6 +6,7 @@ mod http;
 mod server;
 mod utils;
 pub use server::Server;
+
 
 const THREAD_POOL_SIZE: usize = 5;
 

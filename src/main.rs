@@ -1,5 +1,6 @@
 use std::env;
 
+
 fn main() {
     let path = env::args().nth(1).unwrap_or_else(|| {
         // set current directory as target if param is not provided
