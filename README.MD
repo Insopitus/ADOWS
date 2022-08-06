@@ -4,9 +4,21 @@ ADOWS is a small program that runs a local http server to host you web page.
 
 ## Usage
 
-1. get `adows.exe` from the [release page](https://github.com/Insopitus/ADOWS/releases), or use `cargo build --release` to build it yourself.
+1. Get `adows.exe` from the [release page](https://github.com/Insopitus/ADOWS/releases), or use `cargo build --release` to build it yourself.
 
-2. Drag and drop a folder to `adows.exe`, the server will then start hosting the target directory. You can also put `adows.exe` in the target directory and run it there. Further more, since ADOWS is a CLI program you can also use the command line: `adows.exe your/target/directory`.
+2. Run adows in the terminal. Or, you can copy adows.exe to your target directory and run it there.
+
+    cli options: 
+
+    -p, --port=PORT     set the port used. Default one is 8080;
+
+    -d, --dir=DIRECTORY set the directory to serve. Default one is the current directory;
+
+    -c, --cross-origin  allow cross-origin requests;
+
+    -b, --browser       open the browser on server start.
+
+    -h, --help          print help message and exit.
 
 3. The server starts at `http://localhost:8080/` by default, if the port `8080` is in use, ADOWS will try to use `8081`, `8082`, until it finds an available port.
 

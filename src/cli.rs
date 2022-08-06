@@ -10,6 +10,7 @@ const HELP_MESSAGE: &'static str = "
     -p, --port=PORT     set the port used. Default one is 8080;
     -d, --dir=DIRECTORY set the directory to serve. Default one is the current directory;
     -c, --cross-origin  allow cross-origin requests;
+    -b, --browser       open the browser on server start.
     -h, --help          print help message and exit.
 ";
 
@@ -18,6 +19,8 @@ const DEFAULT_PORT:u16 = 8080;
 const DEFAULT_OPEN_BROWSER:bool = false;
 
 const DEFAULT_CROSS_ORIGIN:bool = false;
+
+// TODO revamp the cli settings should be allowed to use like `rm -rf some_dir` => `adows -bc some_dir 8088`
 
 /// cli options struct
 ///
