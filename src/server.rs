@@ -1,10 +1,10 @@
 use std::{
     io::{self, BufRead, BufReader, BufWriter, Write},
     net::{self, TcpStream},
-    sync::Arc,
+    sync::Arc, path::PathBuf,
 };
 
-use crate::THREAD_POOL_SIZE;
+use crate::{THREAD_POOL_SIZE, cli::Config};
 
 use crate::{
     concurrency::ThreadPool,
@@ -15,22 +15,24 @@ use crate::{
 
 pub struct Server {
     listener: net::TcpListener,
-    root_path: String,
+    root_path: PathBuf,
     pub port: u16,
+    cross_origin: bool,
     media_type_map: Arc<MediaType>,
 }
 impl Server {
     /// create a new server instance
-    pub fn new(root_path: &str, port: u16) -> Result<Self, error::Error> {
-        let addr = format!("127.0.0.1:{}", port);
+    pub fn new(config: &Config) -> Result<Self, error::Error> {
+        let addr = format!("127.0.0.1:{}", config.port);
         let listener = net::TcpListener::bind(addr)?;
-        println!("Server listening at http://localhost:{}", port);
+        println!("Server listening at http://localhost:{}", config.port);
         let media_type_map: Arc<MediaType> = Arc::new(MediaType::new());
         let server = Server {
             listener,
-            root_path: root_path.to_string(),
-            port,
+            root_path: config.dir.clone(),
+            port:config.port,
             media_type_map,
+            cross_origin:config.cross_origin
         };
 
         Ok(server)
@@ -42,9 +44,10 @@ impl Server {
             let stream = stream?;
             let media_type_map = self.media_type_map.clone();
             let root_path = self.root_path.clone();
+            let cross_origin = self.cross_origin;
             thread_pool
                 .execute(move || {
-                    match Server::handle_request(stream, media_type_map, root_path) {
+                    match Server::handle_request(stream, media_type_map, root_path, cross_origin) {
                         Ok(_) => {}
                         Err(e) => {
                             println!("{}", e);
@@ -60,13 +63,14 @@ impl Server {
     fn handle_request(
         stream: TcpStream,
         media_type_map: Arc<MediaType>,
-        root_path: String,
+        root_path: PathBuf,
+        cross_origin: bool
     ) -> Result<(), error::Error> {
         let request_header = Server::parse_request(&stream);
         let mut file_reader = None; // TODO use the same file reader instance
         let mut response_header = ResponseHeader::new(400);
         let mut content_length = 0usize;
-        let mut path:&str;
+        let mut path: &str;
         if let Some(request_header) = request_header {
             let default_etag = "unknown-input-etag".to_string();
             let request_etag = request_header.get_entity_tag().unwrap_or(default_etag);
@@ -79,9 +83,8 @@ impl Server {
             print!("Request: {}", path);
 
             // mime type
-            let suffix = path.split('.').last();
-            if let Some(suffix) = suffix {
-                let mime_type = media_type_map.get_mime_type(suffix).unwrap_or("");
+            if let Some((_, ext)) = path.rsplit_once('.') {
+                let mime_type = media_type_map.get_mime_type(ext).unwrap_or("");
                 if !mime_type.is_empty() {
                     response_header.insert_field("Content-Type".to_string(), mime_type.to_string());
                 }
@@ -129,6 +132,10 @@ impl Server {
             };
         } else {
             response_header.code = 400;
+        }
+
+        if cross_origin {
+            response_header.insert_field("Access-Control-Allow-Origin".to_string(), "*".to_string());
         }
 
         // send response headers

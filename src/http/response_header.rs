@@ -28,7 +28,9 @@ impl ResponseHeader {
             404 => "NOT FOUND",
             _ => "BAD REQUEST",
         };
-        response_line.push_str(&format!("{} {}", &self.code.to_string(), code_desc));
+        response_line.push_str(self.code.to_string().as_str());
+        response_line.push(' ');
+        response_line.push_str(code_desc);
         response_line
     }
 }
@@ -39,7 +41,7 @@ impl Display for ResponseHeader {
             f,
             "{}\r\n{}\r\n",
             response_line,
-            self.header_fields.to_string()
+            self.header_fields
         )
     }
 }

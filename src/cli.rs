@@ -1,8 +1,23 @@
 use std::{
-    env::Args,
-    io,
-    path::{Path, PathBuf},
+    env,
+    path::PathBuf,
 };
+
+const HELP_MESSAGE: &'static str = "
+    ADOWS start a local server to serve your static files.
+    Options:
+
+    -p, --port=PORT     set the port used. Default one is 8080;
+    -d, --dir=DIRECTORY set the directory to serve. Default one is the current directory;
+    -c, --cross-origin  allow cross-origin requests;
+    -h, --help          print help message and exit.
+";
+
+const DEFAULT_PORT:u16 = 8080;
+
+const DEFAULT_OPEN_BROWSER:bool = false;
+
+const DEFAULT_CROSS_ORIGIN:bool = false;
 
 /// cli options struct
 ///
@@ -17,9 +32,11 @@ use std::{
 pub struct Config {
     pub port: u16,
     pub dir: PathBuf,
+    pub browser: bool,
+    pub cross_origin: bool,
 }
 
-enum Paring {
+enum Pairing {
     Port,
     Dir,
     None,
@@ -27,47 +44,51 @@ enum Paring {
 
 impl Config {
     /// parse the args (collected as array slice of strings) to create a config
-    pub fn parse(args: &[String]) -> io::Result<Self> {
-        let mut args = args.iter();
-        let mut port = 8080;
-        let mut dir = std::env::current_dir()?;
-        let mut paring = Paring::None;
-        loop {
-            match args.next() {
-                Some(s) => match s.as_str() {
-                    "--help" | "-h" => {
-                        println!("insert help text here");
-                        std::process::exit(0);
-                    }
-                    "--port" | "-p" => {
-                        paring = Paring::Port;
-                        continue;
-                    }
-                    "--dir" | "-d" => {
-                        paring = Paring::Dir;
-                        continue;
-                    }
-                    st => {
-                        match paring {
-                            Paring::Dir => {
-                                dir = PathBuf::from(st);
-                            }
-                            Paring::Port => {
-                                port = st.parse().expect("Unparsable port");
-                            }
-                            Paring::None => {
-                                continue;
-                            }
-                        }
-                        continue;
-                    }
-                },
-                None => {
-                    break;
+    pub fn parse(args: &[String]) -> Self {
+        let mut port = DEFAULT_PORT;
+        let mut dir = env::current_dir()
+            .expect("Failed to get current directory.");
+        let mut browser = DEFAULT_OPEN_BROWSER;
+        let mut cross_origin = DEFAULT_CROSS_ORIGIN;
+
+        let mut paring = Pairing::None;
+
+        for s in args {
+            dbg!(s);
+            match s.as_str() {
+                "--help" | "-h" => {
+                    println!("{}", HELP_MESSAGE);
+                    std::process::exit(0);
                 }
-            };
+                "--port" | "-p" => {
+                    paring = Pairing::Port;
+                }
+                "--dir" | "-d" => {
+                    paring = Pairing::Dir;
+                }
+                "--browser" | "-b" => {
+                    browser = true;
+                }
+                "--cross-origin" | "-c" => {
+                    cross_origin = true;
+                }
+                st => match paring {
+                    Pairing::Dir => {
+                        dir = PathBuf::from(st);
+                    }
+                    Pairing::Port => {
+                        port = st.parse().expect("Unparsable port");
+                    }
+                    Pairing::None => {}
+                },
+            }
         }
-        Ok(Self { port, dir })
+        Self {
+            port,
+            dir,
+            browser,
+            cross_origin,
+        }
     }
 }
 
@@ -77,39 +98,45 @@ mod test {
 
     #[test]
     fn basic() {
-        let options = Config::parse(&["--port".to_string(), "8080".to_string()]).unwrap();
+        let options = Config::parse(&["--port".to_string(), "8080".to_string()]);
         assert_eq!(
             options,
             Config {
-                port: 8080,
-                dir: std::env::current_dir().unwrap(),
+                port: DEFAULT_PORT,
+                dir: env::current_dir().unwrap(),
+                browser: DEFAULT_OPEN_BROWSER,
+                cross_origin:DEFAULT_CROSS_ORIGIN,
             }
         );
     }
     #[test]
     fn basic_2() {
-        let options = Config::parse(&["--dir".to_string(), "/dev".to_string()]).unwrap();
+        let options = Config::parse(&["--dir".to_string(), "/dev".to_string()]);
         assert_eq!(
             options,
             Config {
-                port: 8080,
+                port: DEFAULT_PORT,
                 dir: PathBuf::from("/dev"),
+                browser: DEFAULT_OPEN_BROWSER,
+                cross_origin:DEFAULT_CROSS_ORIGIN
             }
         );
     }
     #[test]
     fn basic_3() {
         let options = Config::parse(&[
-            "--dir".to_string(), 
+            "--dir".to_string(),
             "/dev".to_string(),
             "--port".to_string(),
-            "3000".to_string()
-            ]).unwrap();
+            "3000".to_string(),
+        ]);
         assert_eq!(
             options,
             Config {
                 port: 3000,
                 dir: PathBuf::from("/dev"),
+                browser: DEFAULT_OPEN_BROWSER,
+                cross_origin: DEFAULT_CROSS_ORIGIN
             }
         );
     }

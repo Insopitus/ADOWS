@@ -14,7 +14,7 @@ pub struct FileReader {
 }
 
 impl FileReader {
-    pub fn new(root_path: &str, path: &str) -> Result<Self, io::Error> {
+    pub fn new(root_path: &Path, path: &str) -> Result<Self, io::Error> {
         let root_path = Path::new(root_path);
         let mut sub_path = Path::new(path);
         sub_path = sub_path.strip_prefix("/").unwrap_or(sub_path);
@@ -91,16 +91,18 @@ impl<'a> Iterator for FileChunksReader<'a> {
 
 #[cfg(test)]
 mod tests {
+    use std::path::PathBuf;
+
     use super::FileReader;
 
     #[test]
     fn file_dont_exist() {
-        let reader = FileReader::new("", "tests/assets/404.txt");
+        let reader = FileReader::new(&PathBuf::from(""), "tests/assets/404.txt");
         assert!(reader.is_err());
     }
     #[test]
     fn basic() {
-        let reader = FileReader::new("", "tests/assets/file-reader.txt");
+        let reader = FileReader::new(&PathBuf::from(""), "tests/assets/file-reader.txt");
         assert!(reader.is_ok());
         let reader = reader.unwrap();
         let result = reader._read_as_string();
@@ -110,7 +112,7 @@ mod tests {
     }
     #[test]
     fn chunked() {
-        let reader = FileReader::new("", "tests/assets/file-reader.txt");
+        let reader = FileReader::new(&PathBuf::from(""), "tests/assets/file-reader.txt");
         assert!(reader.is_ok());
         let mut reader = reader.unwrap();
         let mut result: Vec<u8> = Vec::new();

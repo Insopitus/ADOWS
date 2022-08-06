@@ -5,18 +5,19 @@ mod fs;
 mod http;
 mod server;
 mod utils;
+use cli::Config;
 pub use server::Server;
 
 
 const THREAD_POOL_SIZE: usize = 5;
 
-pub fn run(mut port: u16, path: String) {
+pub fn run(mut config:Config) {
     loop {
-        let start = Server::new(&path, port);
+        let start = Server::new(&config);
         match start {
             Err(e) => {
                 if *e.kind() == error::ErrorKind::AddrInUse {
-                    port += 1;
+                    config.port += 1;
                     continue;
                 } else {
                     println!("Server failed to start");
@@ -24,7 +25,8 @@ pub fn run(mut port: u16, path: String) {
                 }
             }
             Ok(mut server) => {
-                utils::open_browser(server.port);
+
+                if config.browser { utils::open_browser(server.port); }
                 server.listen().unwrap(); // TODO error handling
                 break;
             }

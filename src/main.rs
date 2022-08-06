@@ -1,17 +1,14 @@
 use std::env;
 
+use adows::cli::Config;
+
 
 fn main() {
-    let path = env::args().nth(1).unwrap_or_else(|| {
-        // set current directory as target if param is not provided
-        // "www".to_string()
-        env::current_dir()
-            .expect("Failed to get current directory.")
-            .to_string_lossy()
-            .to_string()
-    });
-    let port = 8080;
-    adows::run(port, path);
+    let args:Vec<String> = env::args().skip(1).collect();
+    
+    let config = Config::parse(&args);    
+ 
+    adows::run(config);
 }
 
 // for tests

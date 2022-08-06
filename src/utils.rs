@@ -1,4 +1,3 @@
-use std::env::Args;
 
 /// percent decoding for URIs
 ///
@@ -75,7 +74,6 @@ pub fn open_browser(port: u16) {
         .ok(); // if it fails, it fails.
 }
 
-pub fn cli_args_parse(args: Args) {}
 
 #[cfg(test)]
 mod test_decode {
