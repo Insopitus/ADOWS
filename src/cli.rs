@@ -57,7 +57,6 @@ impl Config {
         let mut paring = Pairing::None;
 
         for s in args {
-            dbg!(s);
             match s.as_str() {
                 "--help" | "-h" => {
                     println!("{}", HELP_MESSAGE);
