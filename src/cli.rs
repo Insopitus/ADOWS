@@ -7,6 +7,7 @@ const HELP_MESSAGE: &'static str = "
     ADOWS start a local server to serve your static files.
     Options:
 
+    -v, --version       print the current version of adows and exit.
     -p, --port=PORT     set the port used. Default one is 8080;
     -d, --dir=DIRECTORY set the directory to serve. Default one is the current directory;
     -c, --cross-origin  allow cross-origin requests;
@@ -60,6 +61,11 @@ impl Config {
             match s.as_str() {
                 "--help" | "-h" => {
                     println!("{}", HELP_MESSAGE);
+                    std::process::exit(0);
+                }
+
+                "--version" | "-v" =>{
+                    println!("adows {}", env!("CARGO_PKG_VERSION"));
                     std::process::exit(0);
                 }
                 "--port" | "-p" => {
