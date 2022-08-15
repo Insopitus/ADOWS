@@ -22,6 +22,7 @@ const DEFAULT_OPEN_BROWSER:bool = false;
 const DEFAULT_CROSS_ORIGIN:bool = false;
 
 // TODO revamp the cli settings should be allowed to use like `rm -rf some_dir` => `adows -bc some_dir 8088`
+// adows [OPTIONS] [DIRECTORY] [PORT]
 
 /// cli options struct
 ///
