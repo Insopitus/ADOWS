@@ -71,7 +71,6 @@ impl Config {
         for s in options_shorten {
             options_flatten.extend(s.chars());
         }
-        dbg!(&options_flatten);
         for c in options_flatten {
             match c {
                 'v' => Config::print_version(),
