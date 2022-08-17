@@ -1,6 +1,6 @@
 use std::{env, path::PathBuf};
 
-const HELP_MESSAGE: &'static str = "
+const HELP_MESSAGE: &str = "
     ADOWS start a local server to serve your static files.
     Usage:
         adows [OPTIONS] [DIRECTORY] [PORT]
@@ -32,7 +32,7 @@ impl Config {
     /// parse the args (collected as array slice of strings) to create a config
     pub fn parse(args: &[String]) -> Result<Self, Error> {
         let mut port = PORT;
-        let mut dir: Option<PathBuf> = None;
+        let dir: PathBuf;
         let mut open_browser = OPEN_BROWSER;
         let mut cross_origin = CROSS_ORIGIN;
 
@@ -40,16 +40,16 @@ impl Config {
         let mut commands = Vec::new();
 
         for s in args {
-            if s.starts_with("-") {
-                options.push(&s[1..]);
-            } else {
+            if let Some(stripped) = s.strip_prefix('-'){
+                options.push(stripped);
+            }else{
                 commands.push(s);
             }
         }
         // turn all long options to their short form
         let mut options_shorten = Vec::with_capacity(options.len());
         for s in options {
-            if s.starts_with("-") {
+            if s.starts_with('-') {
                 options_shorten.push(match s {
                     "-version" => "v",
                     "-open-browser" => "b",
@@ -91,18 +91,18 @@ impl Config {
         }
         match commands.len() {
             0 => {
-                dir = Some(env::current_dir().map_err(|_| {
+                dir = env::current_dir().map_err(|_| {
                     Error::new(
                         ErrorKind::CannotGetCurrentDir,
                         "Could not get current directory".to_string(),
                     )
-                })?);
+                })?;
             }
             1 => {
-                dir = Some(PathBuf::from(commands[0]));
+                dir = PathBuf::from(commands[0]);
             }
             2 => {
-                dir = Some(PathBuf::from(commands[0]));
+                dir = PathBuf::from(commands[0]);
                 port = commands[1].parse::<u16>().map_err(|_| {
                     Error::new(
                         ErrorKind::InvalidPort(commands[1].to_string()),
@@ -117,18 +117,10 @@ impl Config {
                 ));
             }
         }
-        if dir.is_none() {
-            dir = Some(env::current_dir().map_err(|_| {
-                Error::new(
-                    ErrorKind::CannotGetCurrentDir,
-                    "Cannot get current directory".to_string(),
-                )
-            })?)
-        }
 
         Ok(Self {
             port,
-            dir: dir.unwrap(),
+            dir,
             open_browser,
             cross_origin,
         })
