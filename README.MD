@@ -6,21 +6,23 @@ ADOWS is a small program that runs a local http server to host you web page.
 
 1. Get `adows.exe` from the [release page](https://github.com/Insopitus/ADOWS/releases), or use `cargo build --release` to build it yourself.
 
-2. Run adows in the terminal. Or, you can copy adows.exe to your target directory and run it there.
+2. Run adows in the terminal. Or, you can copy adows.exe to your target directory and double click to run it there.
+    ```
+    Usage:
+        adows [OPTIONS] [DIRECTORY] [PORT]
 
-    cli options: 
+    Options:
+        -v, --version       print the current version of adows and exit.
+        -h, --help          print this message and exit.
+        -c, --cross-origin  send cross-origin header field.
+        -b, --open-browser  open the browser on server start.
+    ```
+    example: 
 
-    -p, --port=PORT     set the port used. Default one is 8080;
+    run `adows -bc ./www` to host your files in directory `./www` in [http://localhost:8080](http://localhost:8080), using the default port 8080, and open the browser once the server starts.
 
-    -d, --dir=DIRECTORY set the directory to serve. Default one is the current directory;
 
-    -c, --cross-origin  allow cross-origin requests;
-
-    -b, --browser       open the browser on server start.
-
-    -h, --help          print help message and exit.
-
-3. The server starts at `http://localhost:8080/` by default, if the port `8080` is in use, ADOWS will try to use `8081`, `8082`, until it finds an available port.
+3. If the port is in use or is not available, adows will try to use another usable port, like 8081, 8082.
 
 *for linux users, you have to run `cargo build --release` to build it on your machine and run adows in the terminal.
 

@@ -6,9 +6,18 @@ use adows::cli::Config;
 fn main() {
     let args:Vec<String> = env::args().skip(1).collect();
     
-    let config = Config::parse(&args);    
+    let config = Config::parse(&args);
+
+    match config {
+        Ok(cfg)=>{
+            adows::run(cfg);
+        },
+        Err(e)=>{
+            println!("{}",e.message);
+        }
+    };
+
  
-    adows::run(config);
 }
 
 // for tests

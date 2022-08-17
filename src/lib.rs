@@ -26,7 +26,7 @@ pub fn run(mut config:Config) {
             }
             Ok(mut server) => {
 
-                if config.browser { utils::open_browser(server.port); }
+                if config.open_browser { utils::open_browser(server.port); }
                 server.listen().unwrap(); // TODO error handling
                 break;
             }
