@@ -1,4 +1,3 @@
-
 /// percent decoding for URIs
 ///
 /// returns the original characters when meeting invalid percent encoding e.g. "%7s"->"%7s"
@@ -66,6 +65,12 @@ fn ascii_hex_char_byte_to_number(b: u8) -> Option<u8> {
 
 /// auto start the browser (windows)
 pub fn open_browser(port: u16) {
+    #[cfg(target_family = "unix")]
+    std::process::Command::new("xdg-open")
+        .arg(format!("http://localhost:{}", port))
+        .spawn()
+        .ok();
+    #[cfg(target_family = "windows")]
     std::process::Command::new("cmd.exe")
         .arg("/C")
         .arg("start")
@@ -73,7 +78,6 @@ pub fn open_browser(port: u16) {
         .spawn()
         .ok(); // if it fails, it fails.
 }
-
 
 #[cfg(test)]
 mod test_decode {
