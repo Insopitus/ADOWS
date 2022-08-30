@@ -63,7 +63,7 @@ fn ascii_hex_char_byte_to_number(b: u8) -> Option<u8> {
     }
 }
 
-/// auto start the browser (windows)
+/// auto start the browser (windows and linux)
 pub fn open_browser(port: u16) {
     #[cfg(target_os = "linux")]
     std::process::Command::new("xdg-open")
