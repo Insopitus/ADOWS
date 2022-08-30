@@ -65,12 +65,12 @@ fn ascii_hex_char_byte_to_number(b: u8) -> Option<u8> {
 
 /// auto start the browser (windows)
 pub fn open_browser(port: u16) {
-    #[cfg(target_family = "unix")]
+    #[cfg(target_os = "linux")]
     std::process::Command::new("xdg-open")
         .arg(format!("http://localhost:{}", port))
         .spawn()
-        .ok();
-    #[cfg(target_family = "windows")]
+        .ok();// if it fails, it fails.
+    #[cfg(target_os = "windows")]
     std::process::Command::new("cmd.exe")
         .arg("/C")
         .arg("start")
