@@ -58,7 +58,7 @@ impl Config {
                     _ => {
                         return Err(Error::new(
                             ErrorKind::InvalidOption(s.to_string()),
-                            format!("Invalid option: {}", s),
+                            format!("Invalid option: -{}", s),
                         ))
                     }
                 })

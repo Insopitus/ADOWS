@@ -45,8 +45,9 @@ On the other hand, the project is written for learning and practising purpose. I
 1. implement keep-alive header to boost performance
 1. fewer allocations (mostly strings)
 3. multi-thread error recovery;
+4. async (if implementing a async runtime is not that complicated);
+5. HTTP/2
 
 ## May Not Do
 1. more http header supports, only if it's needed;
-8. HTTP/2.0 support
 9. gzip and other compressions
