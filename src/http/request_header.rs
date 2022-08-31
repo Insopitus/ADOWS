@@ -1,7 +1,7 @@
 use super::HeaderFields;
 use crate::utils::percent_decode;
 
-/// An HTTP Request parser
+/// HTTP Request parser
 ///
 /// An HTTP Requset is made up of three parts:
 ///

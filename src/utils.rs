@@ -85,17 +85,18 @@ mod test_decode {
 
     #[test]
     fn decode_cjk_characters() {
-        let string = "%E5%85%A8%E5%9B%BD";
-        assert_eq!(percent_decode(string), "全国".to_string())
+        assert_eq!(percent_decode("%E4%B8%AD%E6%96%87"), "中文".to_string());
+        assert_eq!(percent_decode("%E6%97%A5%E6%9C%AC%E8%AA%9E"),"日本語".to_string());
+        assert_eq!(percent_decode("%ED%95%9C%EA%B5%AD%EC%96%B4"), "한국어".to_string());
     }
     #[test]
-    fn decode_reserved_characters() {
-        let string = "%7B%22a%22:1,%22b%22:%22bar%22%7D";
-        assert_eq!(percent_decode(string), "{\"a\":1,\"b\":\"bar\"}");
+    fn decode_reserved() {
+        let s = "%7B%22a%22:1,%22b%22:%22bar%22%7D";
+        assert_eq!(percent_decode(s), r#"{"a":1,"b":"bar"}"#);
     }
     #[test]
     fn decode_none_percent_encoded() {
-        let string = "%7s";
-        assert_eq!(percent_decode(string), "%7s");
+        let s = "%7s%5";
+        assert_eq!(percent_decode(s), "%7s%5");
     }
 }
