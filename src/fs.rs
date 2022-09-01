@@ -15,7 +15,6 @@ pub struct FileReader {
 
 impl FileReader {
     pub fn new(root_path: &Path, path: &str) -> Result<Self, io::Error> {
-        let root_path = Path::new(root_path);
         let mut sub_path = Path::new(path);
         sub_path = sub_path.strip_prefix("/").unwrap_or(sub_path);
         sub_path = sub_path.strip_prefix("./").unwrap_or(sub_path);

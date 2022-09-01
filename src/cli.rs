@@ -20,7 +20,7 @@ const OPEN_BROWSER: bool = false;
 
 const CROSS_ORIGIN: bool = false;
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq,Eq, Debug)]
 pub struct Config {
     pub port: u16,
     pub dir: PathBuf,

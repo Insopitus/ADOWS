@@ -15,7 +15,7 @@ impl HeaderFields {
         self.map.insert(k, v);
     }
     /// return the hashmap of field pairs
-    pub fn table(&self) -> &HashMap<String, String> {
+    pub fn _table(&self) -> &HashMap<String, String> {
         &self.map
     }
 
@@ -75,29 +75,29 @@ mod test {
     fn from_string() {
         let line = "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9";
         let field = HeaderFields::from(line);
-        assert_eq!(field.table().get("Accept").unwrap(),"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+        assert_eq!(field._table().get("Accept").unwrap(),"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
     }
     #[test]
     fn from_multi_line_string() {
         let lines = "Accept-Encoding: gzip, deflate, br\r\nAccept-Language: zh-CN,zh;q=0.9,en;q=0.8\r\nCache-Control: max-age=0\r\nConnection: keep-alive";
         let field = HeaderFields::from(lines);
         assert_eq!(
-            field.table().get("Accept-Encoding").unwrap(),
+            field._table().get("Accept-Encoding").unwrap(),
             "gzip, deflate, br"
         );
         assert_eq!(
-            field.table().get("Accept-Language").unwrap(),
+            field._table().get("Accept-Language").unwrap(),
             "zh-CN,zh;q=0.9,en;q=0.8"
         );
-        assert_eq!(field.table().get("Cache-Control").unwrap(), "max-age=0");
-        assert_eq!(field.table().get("Connection").unwrap(), "keep-alive");
+        assert_eq!(field._table().get("Cache-Control").unwrap(), "max-age=0");
+        assert_eq!(field._table().get("Connection").unwrap(), "keep-alive");
     }
 
     #[test]
     fn from_broken_string() {
         let line = "Sec-Fetch-Dest:\r\nSec-Fetch-Site";
         let field = HeaderFields::from(line);
-        let map = field.table();
+        let map = field._table();
         assert_eq!(map.get("Sec-Fetch-Dest").unwrap(), "");
         assert_eq!(map.get("Sec-Fetch-Site"), None);
     }

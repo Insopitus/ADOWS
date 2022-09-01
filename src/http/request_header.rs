@@ -14,8 +14,8 @@ use crate::utils::percent_decode;
 /// this structure covers the first two parts (so-called header)
 pub struct RequestHeader {
     path: String,
-    method: String,
-    version: String,
+    _method: String,
+    _version: String,
     header_fields: HeaderFields,
 }
 impl RequestHeader {
@@ -34,25 +34,25 @@ impl RequestHeader {
         } else {
             Some(RequestHeader {
                 path,
-                method,
-                version,
+                _method: method,
+                _version: version,
                 header_fields,
             })
         }
     }
-    pub fn get_method(&self) -> &String {
-        &self.method
+    pub fn _get_method(&self) -> &String {
+        &self._method
     }
     pub fn get_path(&self) -> &String {
         &self.path
     }
-    pub fn get_version(&self) -> &String {
-        &self.version
+    pub fn _get_version(&self) -> &String {
+        &self._version
     }
-    pub fn is_get(&self) -> bool {
-        self.method == "GET"
+    pub fn _is_get(&self) -> bool {
+        self._method == "GET"
     }
-    pub fn get_content_length(&self) -> usize {
+    pub fn _get_content_length(&self) -> usize {
         self.header_fields
             .get("Content-Length")
             .unwrap_or(&String::from("0"))
