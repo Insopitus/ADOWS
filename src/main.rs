@@ -13,7 +13,7 @@ fn main() {
             adows::run(cfg);
         },
         Err(e)=>{
-            println!("{}",e.message);
+            eprintln!("{}",e.message);
         }
     };
 

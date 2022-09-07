@@ -14,10 +14,13 @@ const HELP_MESSAGE: &str = "
 // TODO extra options:
 // -k, --keep-alive    allow keep-alive connections (not implemented yet).
 
+/// default port
 const PORT: u16 = 8080;
 
+/// default value for open_browser
 const OPEN_BROWSER: bool = false;
 
+/// default value for cross_origin/cors
 const CROSS_ORIGIN: bool = false;
 
 #[derive(PartialEq,Eq, Debug)]
@@ -84,7 +87,7 @@ impl Config {
                 _ => {
                     return Err(Error::new(
                         ErrorKind::InvalidOption(c.to_string()),
-                        format!("Invalid option: {}", c),
+                        format!("Invalid option: -{}", c),
                     ));
                 }
             }
