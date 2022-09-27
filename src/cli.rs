@@ -10,6 +10,7 @@ const HELP_MESSAGE: &str = "
         -h, --help          print this message and exit.
         -c, --cross-origin  send cross-origin header field.
         -b, --open-browser  open the browser on server start.
+        -s, --silent        prevent adows from logging to the output.
 ";
 // TODO extra options:
 // -k, --keep-alive    allow keep-alive connections (not implemented yet).
@@ -26,12 +27,16 @@ const OPEN_BROWSER: bool = false;
 /// default value for cross_origin/cors
 const CROSS_ORIGIN: bool = false;
 
+/// default value for silent
+const SILENT:bool = false;
+
 #[derive(PartialEq,Eq, Debug)]
 pub struct Config {
     pub port: u16,
     pub dir: PathBuf,
     pub open_browser: bool,
     pub cross_origin: bool,
+    pub silent:bool,
 }
 
 impl Config {
@@ -41,6 +46,7 @@ impl Config {
         let dir: PathBuf;
         let mut open_browser = OPEN_BROWSER;
         let mut cross_origin = CROSS_ORIGIN;
+        let mut silent = SILENT;
 
         let mut options = Vec::new();
         let mut commands = Vec::new();
@@ -61,6 +67,7 @@ impl Config {
                     "-open-browser" => "b",
                     "-cross-origin" => "c",
                     "-help" => "h",
+                    "-silent"=>"s",
                     _ => {
                         return Err(Error::new(
                             ErrorKind::InvalidOption(s.to_string()),
@@ -86,6 +93,9 @@ impl Config {
                 }
                 'b' => {
                     open_browser = true;
+                }
+                's' => {
+                    silent = true
                 }
                 _ => {
                     return Err(Error::new(
@@ -129,6 +139,7 @@ impl Config {
             dir,
             open_browser,
             cross_origin,
+            silent,
         })
     }
     fn print_version() {
@@ -175,6 +186,7 @@ mod test {
                 dir: PathBuf::from("./"),
                 open_browser: OPEN_BROWSER,
                 cross_origin: CROSS_ORIGIN,
+                silent:SILENT,
             }
         );
     }
@@ -187,7 +199,8 @@ mod test {
                 port: PORT,
                 dir: PathBuf::from("/dev"),
                 open_browser: OPEN_BROWSER,
-                cross_origin: CROSS_ORIGIN
+                cross_origin: CROSS_ORIGIN,
+                silent:SILENT,
             }
         );
     }
@@ -200,7 +213,8 @@ mod test {
                 port: PORT,
                 dir: env::current_dir().unwrap(),
                 open_browser: true,
-                cross_origin: true
+                cross_origin: true,
+                silent:SILENT,
             }
         );
     }
@@ -213,7 +227,22 @@ mod test {
                 port: PORT,
                 dir: env::current_dir().unwrap(),
                 open_browser: true,
-                cross_origin: true
+                cross_origin: true,
+                silent:SILENT,
+            }
+        );
+    }
+    #[test]
+    fn test_silent(){
+        let options = Config::parse(&["-cbs".to_string()]).unwrap();
+        assert_eq!(
+            options,
+            Config {
+                port: PORT,
+                dir: env::current_dir().unwrap(),
+                open_browser: true,
+                cross_origin: true,
+                silent:true,
             }
         );
     }

@@ -18,6 +18,7 @@ pub struct Server {
     root_path: PathBuf,
     pub port: u16,
     cross_origin: bool,
+    silent_mode:bool,
     media_type_map: Arc<MediaType>,
 }
 impl Server {
@@ -25,14 +26,17 @@ impl Server {
     pub fn new(config: &Config) -> Result<Self, error::Error> {
         let addr = format!("127.0.0.1:{}", config.port);
         let listener = net::TcpListener::bind(addr)?;
-        println!("Server listening at http://localhost:{}", config.port);
+        if !config.silent{
+            println!("Server listening at http://localhost:{}", config.port);
+        }
         let media_type_map: Arc<MediaType> = Arc::new(MediaType::new());
         let server = Server {
             listener,
             root_path: config.dir.clone(),
             port:config.port,
             media_type_map,
-            cross_origin:config.cross_origin
+            cross_origin:config.cross_origin,
+            silent_mode:config.silent,
         };
 
         Ok(server)
@@ -45,9 +49,10 @@ impl Server {
             let media_type_map = self.media_type_map.clone();
             let root_path = self.root_path.clone();
             let cross_origin = self.cross_origin;
+            let silent_mode = self.silent_mode;
             thread_pool
                 .execute(move || {
-                    match Server::handle_request(stream, media_type_map, root_path, cross_origin) {
+                    match Server::handle_request(stream, media_type_map, root_path, cross_origin,silent_mode) {
                         Ok(_) => {}
                         Err(e) => {
                             println!("{}", e);
@@ -64,7 +69,8 @@ impl Server {
         stream: TcpStream,
         media_type_map: Arc<MediaType>,
         root_path: PathBuf,
-        cross_origin: bool
+        cross_origin: bool,
+        silent_mode:bool,
     ) -> Result<(), error::Error> {
         let request_header = Server::parse_request(&stream);
         let mut file_reader = None; // TODO use the same file reader instance
@@ -122,7 +128,9 @@ impl Server {
 
                         response_header.insert_field("ETag".to_string(), reader.get_entity_tag());
                     }
-                    println!(" - {}", code);
+                    if !silent_mode {
+                        println!(" - {}", code);
+                    }
                     response_header.code = code;
                     file_reader = Some(reader);
                 }
