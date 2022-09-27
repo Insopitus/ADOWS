@@ -13,6 +13,9 @@ const HELP_MESSAGE: &str = "
 ";
 // TODO extra options:
 // -k, --keep-alive    allow keep-alive connections (not implemented yet).
+// -g, --gzip          if request header accepts gz, adows will send [filename].[ext].gz instead
+// --brotli            if request header accepts br, adows will send [filename].[ext].br instead 
+// -s, --silent        will print no output to stdout
 
 /// default port
 const PORT: u16 = 8080;
