@@ -86,7 +86,9 @@ impl Server {
             } else {
                 path
             };
-            print!("Request: {}", path);
+            if !silent_mode{
+                print!("Request: {}", path);
+            }
 
             // mime type
             if let Some((_, ext)) = path.rsplit_once('.') {

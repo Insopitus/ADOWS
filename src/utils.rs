@@ -85,9 +85,9 @@ mod test_decode {
 
     #[test]
     fn decode_cjk_characters() {
-        assert_eq!(percent_decode("%E4%B8%AD%E6%96%87"), "中文".to_string());
-        assert_eq!(percent_decode("%E6%97%A5%E6%9C%AC%E8%AA%9E"),"日本語".to_string());
-        assert_eq!(percent_decode("%ED%95%9C%EA%B5%AD%EC%96%B4"), "한국어".to_string());
+        assert_eq!(percent_decode("%E4%B8%AD%E6%96%87"), "中文");
+        assert_eq!(percent_decode("%E6%97%A5%E6%9C%AC%E8%AA%9E"),"日本語");
+        assert_eq!(percent_decode("%ED%95%9C%EA%B5%AD%EC%96%B4"), "한국어");
     }
     #[test]
     fn decode_reserved() {
